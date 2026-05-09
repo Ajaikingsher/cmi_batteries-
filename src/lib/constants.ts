@@ -20,7 +20,7 @@ export const COMPANY_INFO = {
   website: "www.cmibattery.com",
   instagram: "perfect_batteries",
   experience: "42+ Years",
-  logo: "/assets/LOGO/2.jpeg",
+  logo: "/assets/LOGO/logo2.png",
 };
 
 export const PRODUCTS = [

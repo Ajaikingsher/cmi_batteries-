@@ -1,99 +1,185 @@
+import type { Metadata } from "next";
+import { COMPANY_INFO } from "@/lib/constants";
+import { Zap, Award, Users, MapPin, Phone, Mail, Factory } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
-import Image from "next/image";
-import { COMPANY_INFO } from "@/lib/constants";
-import { Target, Eye, Award, Users, Factory, Zap } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "About Us | Chinna Mayil Industries — Perfect Batteries",
+  description: "Learn about Chinna Mayil Industries, the manufacturer of Perfect Batteries. 42+ years of battery manufacturing excellence in Coimbatore, Tamil Nadu.",
+};
+
+const milestones = [
+  { year: "1982", event: "Chinna Mayil Industries founded in Coimbatore" },
+  { year: "1995", event: "Expanded to automotive battery manufacturing" },
+  { year: "2005", event: "Launched the Perfect Batteries brand" },
+  { year: "2015", event: "Introduced Non-Maintenance Lithium technology" },
+  { year: "2020", event: "Expanded pan-India dealer network" },
+  { year: "2024", event: "Launched digital platform & dealer portal" },
+];
+
+const stats = [
+  { label: "Years of Experience", value: "42+", icon: Award },
+  { label: "Products Manufactured", value: "50K+", icon: Factory },
+  { label: "Active Dealers", value: "200+", icon: Users },
+  { label: "States Covered", value: "15+", icon: MapPin },
+];
+
+const values = [
+  { title: "Quality First", desc: "Every battery undergoes rigorous quality control before leaving our facility." },
+  { title: "Innovation", desc: "We continuously invest in R&D to bring cutting-edge lithium technology to market." },
+  { title: "Reliability", desc: "Our customers trust us for consistent performance across all use cases." },
+  { title: "Sustainability", desc: "We are committed to eco-friendly manufacturing and responsible disposal." },
+];
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen pt-20">
+    <>
       <Navbar />
-      
-      {/* Hero Section */}
-      <section className="py-24 bg-black relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-1/2 h-full opacity-30 pointer-events-none">
-          <Image src="/assets/batt2-removebg-preview.png" alt="Factory" fill className="object-contain" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent" />
-        </div>
-        
-        <div className="container mx-auto px-4 md:px-6 relative z-10">
-          <div className="max-w-3xl space-y-6">
-            <div className="text-primary font-bold uppercase tracking-widest text-sm">Our Legacy</div>
-            <h1 className="text-5xl md:text-7xl font-heading font-bold text-white leading-tight">
-              42 Years of <br />
-              <span className="text-primary neon-glow">Manufacturing Mastery</span>
+      <main className="min-h-screen bg-[#0A0A0A]">
+        {/* Hero */}
+        <section className="bg-gradient-to-b from-black to-[#0A0A0A] py-24 px-4 text-center">
+          <div className="max-w-4xl mx-auto">
+            <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-6">
+              <Zap className="w-3 h-3" /> Est. 1982
+            </div>
+            <h1 className="text-5xl md:text-6xl font-heading font-bold text-white mb-4">
+              About {COMPANY_INFO.name}
             </h1>
-            <p className="text-gray-400 text-lg leading-relaxed max-w-xl">
-              {COMPANY_INFO.name} is a leading lithium battery manufacturer based in Coimbatore, delivering high-performance, eco-friendly, long-life battery solutions for vehicles, homes, offices, and UPS systems.
+            <p className="text-gray-300 text-lg max-w-2xl mx-auto leading-relaxed">
+              For over four decades, we have been powering lives across India with high-performance,
+              reliable battery solutions under the <span className="text-primary font-semibold">Perfect Batteries</span> brand.
             </p>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Stats */}
-      <section className="py-20 border-y border-white/5 bg-[#050505]">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-12">
-            {[
-              { label: "Years Experience", value: "42+", icon: Award },
-              { label: "Dealers Nationwide", value: "500+", icon: Users },
-              { label: "Batteries Sold", value: "100k+", icon: Zap },
-              { label: "Manufacturing Units", value: "3", icon: Factory },
-            ].map((stat, i) => (
-              <div key={i} className="flex flex-col items-center text-center space-y-4">
-                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                  <stat.icon className="w-6 h-6" />
-                </div>
-                <div>
-                  <div className="text-4xl font-heading font-bold text-white">{stat.value}</div>
-                  <div className="text-xs text-gray-500 uppercase tracking-widest mt-1">{stat.label}</div>
-                </div>
+        {/* Stats */}
+        <section className="max-w-6xl mx-auto px-4 py-16">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+            {stats.map(({ label, value, icon: Icon }) => (
+              <div key={label} className="bg-white/5 border border-white/10 rounded-2xl p-6 text-center hover:border-primary/30 transition-colors">
+                <Icon className="w-6 h-6 text-primary mx-auto mb-3" />
+                <div className="text-3xl font-heading font-bold text-white">{value}</div>
+                <div className="text-gray-400 text-sm mt-1">{label}</div>
               </div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Story */}
-      <section className="py-24 bg-black">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-            <div className="relative aspect-[3/4] rounded-[2rem] overflow-hidden border border-white/10 bg-white">
-              <Image src="/assets/refer.jpeg" alt="Technical Specifications" fill className="object-contain p-4" />
+        {/* Story */}
+        <section className="max-w-6xl mx-auto px-4 py-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <h2 className="text-3xl font-heading font-bold text-white mb-6">Our Story</h2>
+              <div className="space-y-4 text-gray-300 leading-relaxed">
+                <p>
+                  Founded in 1982 by visionary entrepreneurs in Coimbatore, Chinna Mayil Industries
+                  began as a small battery service workshop. Over the decades, driven by a passion
+                  for quality and innovation, we grew into one of South India&apos;s most trusted
+                  battery manufacturers.
+                </p>
+                <p>
+                  Our flagship brand, <strong className="text-white">Perfect Batteries</strong>, represents
+                  our commitment to delivering non-maintenance lithium batteries that outperform conventional
+                  alternatives in durability, performance, and value.
+                </p>
+                <p>
+                  Today, with a state-of-the-art manufacturing facility in Madukkarai, Coimbatore,
+                  we serve customers and dealers across 15+ states, backed by a robust pan-India
+                  service network.
+                </p>
+              </div>
+              <div className="mt-6 flex items-center gap-2 text-sm text-gray-400">
+                <MapPin className="w-4 h-4 text-primary" />
+                {COMPANY_INFO.address}
+              </div>
             </div>
-            <div className="space-y-8">
-              <h2 className="text-3xl md:text-4xl font-heading font-bold text-white">Innovation Journey</h2>
-              <div className="space-y-6 text-gray-400 leading-relaxed">
-                <p>
-                  From our humble beginnings in 1982 to becoming a pioneer in lithium technology, our journey has always been driven by one goal: Powering Your Ride with precision.
-                </p>
-                <p>
-                  Based in the industrial heart of Coimbatore, Tamil Nadu, we have evolved through four decades of battery technology transitions—from traditional lead-acid to the next-generation lithium-ion solutions we lead today.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-8">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3 text-primary">
-                    <Target className="w-6 h-6" />
-                    <h4 className="font-heading font-bold text-white">Our Mission</h4>
+            <div className="space-y-3">
+              <h3 className="text-xl font-heading font-bold text-white mb-4">Our Journey</h3>
+              {milestones.map((m, i) => (
+                <div key={m.year} className="flex items-start gap-4">
+                  <div className="flex flex-col items-center">
+                    <div className="w-10 h-10 bg-primary/10 border border-primary/20 rounded-full flex items-center justify-center text-primary text-xs font-heading font-bold shrink-0">
+                      {m.year.slice(2)}
+                    </div>
+                    {i < milestones.length - 1 && (
+                      <div className="w-px h-6 bg-white/10 mt-1" />
+                    )}
                   </div>
-                  <p className="text-sm text-gray-500">To accelerate the transition to sustainable energy through high-performance battery technology.</p>
-                </div>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3 text-primary">
-                    <Eye className="w-6 h-6" />
-                    <h4 className="font-heading font-bold text-white">Our Vision</h4>
+                  <div className="pb-4">
+                    <span className="text-primary text-xs font-mono font-bold">{m.year}</span>
+                    <p className="text-gray-300 text-sm mt-0.5">{m.event}</p>
                   </div>
-                  <p className="text-sm text-gray-500">To be the global benchmark for reliability and innovation in energy storage solutions.</p>
                 </div>
-              </div>
+              ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
+        {/* Values */}
+        <section className="max-w-6xl mx-auto px-4 py-12">
+          <h2 className="text-3xl font-heading font-bold text-white text-center mb-10">Our Values</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {values.map(({ title, desc }) => (
+              <div key={title} className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:border-primary/30 transition-colors">
+                <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                  <Zap className="w-4 h-4 text-primary" />
+                </div>
+                <h3 className="font-heading font-bold text-white mb-2">{title}</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">{desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Contact info */}
+        <section className="max-w-6xl mx-auto px-4 py-12">
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-8 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+            <div>
+              <Phone className="w-6 h-6 text-primary mx-auto mb-2" />
+              <p className="text-gray-400 text-sm">Phone</p>
+              <p className="text-white font-medium">{COMPANY_INFO.phone}</p>
+            </div>
+            <div>
+              <Mail className="w-6 h-6 text-primary mx-auto mb-2" />
+              <p className="text-gray-400 text-sm">Email</p>
+              <p className="text-white font-medium">{COMPANY_INFO.email}</p>
+            </div>
+            <div>
+              <MapPin className="w-6 h-6 text-primary mx-auto mb-2" />
+              <p className="text-gray-400 text-sm">Location</p>
+              <p className="text-white font-medium">Madukkarai, Coimbatore</p>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section className="max-w-4xl mx-auto px-4 py-16 text-center">
+          <h2 className="text-3xl font-heading font-bold text-white mb-4">
+            Ready to Power Your Business?
+          </h2>
+          <p className="text-gray-400 mb-8">
+            Join our dealer network and get access to exclusive pricing and support.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              href="/auth/dealer-register"
+              className="bg-primary text-black font-heading font-bold px-8 py-3.5 rounded-xl hover:bg-primary/90 transition-colors"
+            >
+              Become a Dealer
+            </Link>
+            <Link
+              href="/contact"
+              className="border border-white/20 text-white font-medium px-8 py-3.5 rounded-xl hover:bg-white/5 transition-colors"
+            >
+              Contact Us
+            </Link>
+          </div>
+        </section>
+      </main>
       <Footer />
-    </main>
+    </>
   );
 }

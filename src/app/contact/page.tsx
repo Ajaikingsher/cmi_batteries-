@@ -1,104 +1,171 @@
-"use client";
-
-import React from "react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { Phone, Mail, MapPin, Clock, Send } from "lucide-react";
+import { COMPANY_INFO } from "@/lib/constants";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Mail, Phone, MapPin, Clock, ArrowRight, MessageCircle, Globe, MessageSquare, Zap } from "lucide-react";
-import { COMPANY_INFO } from "@/lib/constants";
+
+export const metadata: Metadata = {
+  title: "Contact Us | Perfect Batteries",
+  description: "Get in touch with Chinna Mayil Industries — the makers of Perfect Batteries. Located in Coimbatore, Tamil Nadu.",
+};
 
 export default function ContactPage() {
   return (
-    <main className="min-h-screen pt-20 bg-black">
+    <main className="min-h-screen bg-[#0A0A0A]">
       <Navbar />
-      
-      <section className="py-24 relative overflow-hidden">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
-            <div className="space-y-12">
-              <div className="space-y-6">
-                <h1 className="text-5xl md:text-7xl font-heading font-bold text-white">Get in <span className="text-primary">Touch</span></h1>
-                <p className="text-gray-400 text-lg leading-relaxed max-w-md">
-                  Have questions about our lithium technology? Our engineering and sales team is here to help.
-                </p>
-              </div>
+      {/* Header */}
+      <section className="bg-gradient-to-b from-black to-[#0A0A0A] border-b border-white/5 pt-32 pb-16 px-4">
+        <div className="max-w-7xl mx-auto text-center">
+          <h1 className="text-4xl md:text-5xl font-heading font-bold text-white">Get in Touch</h1>
+          <p className="text-gray-400 mt-3 max-w-xl mx-auto">
+            We&apos;re here to help with your battery requirements, dealer inquiries, and warranty support.
+          </p>
+        </div>
+      </section>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {[
-                  { icon: Phone, label: "Call Us", value: COMPANY_INFO.phone, sub: "Mon-Sat 9am to 6pm" },
-                  { icon: Mail, label: "Email Us", value: COMPANY_INFO.email, sub: "Response within 24hrs" },
-                  { icon: MapPin, label: "Visit Us", value: "Coimbatore, India", sub: "Factory HQ" },
-                  { icon: Clock, label: "Working Hours", value: "9:00 AM - 6:30 PM", sub: "Closed on Sundays" },
-                ].map((item, i) => (
-                  <div key={i} className="space-y-3 p-6 rounded-3xl bg-[#0A0A0A] border border-white/5 hover:border-primary/20 transition-all">
-                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                      <item.icon className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">{item.label}</div>
-                      <div className="text-white font-bold mt-1">{item.value}</div>
-                      <div className="text-xs text-gray-500 mt-1">{item.sub}</div>
-                    </div>
+      <div className="max-w-7xl mx-auto px-4 py-16">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
+          {/* Contact Info */}
+          <div className="lg:col-span-2 space-y-6">
+            <div>
+              <h2 className="text-2xl font-heading font-bold text-white mb-6">Contact Information</h2>
+              <div className="space-y-4">
+                <div className="flex items-start gap-4 bg-white/5 border border-white/10 rounded-2xl p-4">
+                  <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                    <MapPin className="w-5 h-5 text-primary" />
                   </div>
-                ))}
-              </div>
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">Address</p>
+                    <p className="text-white text-sm leading-relaxed">{COMPANY_INFO.address}</p>
+                  </div>
+                </div>
 
-              <div className="flex gap-4 pt-4">
-                {[Globe, MessageSquare, Zap].map((Icon, i) => (
-                  <Button key={i} variant="outline" size="icon" className="w-14 h-14 rounded-full border-white/10 hover:border-primary hover:text-primary transition-all">
-                    <Icon className="w-6 h-6" />
-                  </Button>
-                ))}
-                <Button className="h-14 px-8 rounded-full bg-[#25D366] text-white hover:bg-[#25D366]/90 font-bold gap-2">
-                  <MessageCircle className="w-5 h-5 fill-white" /> WhatsApp
-                </Button>
+                <div className="flex items-center gap-4 bg-white/5 border border-white/10 rounded-2xl p-4">
+                  <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                    <Phone className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">Phone</p>
+                    <a href={`tel:${COMPANY_INFO.phone.replace(/\s/g, "")}`} className="text-white hover:text-primary transition-colors">
+                      {COMPANY_INFO.phone}
+                    </a>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4 bg-white/5 border border-white/10 rounded-2xl p-4">
+                  <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                    <Mail className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">Email</p>
+                    <a href={`mailto:${COMPANY_INFO.email}`} className="text-white hover:text-primary transition-colors">
+                      {COMPANY_INFO.email}
+                    </a>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4 bg-white/5 border border-white/10 rounded-2xl p-4">
+                  <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                    <Clock className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">Business Hours</p>
+                    <p className="text-white text-sm">Mon – Sat: 9:00 AM – 6:00 PM</p>
+                    <p className="text-gray-500 text-sm">Sunday: Closed</p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="bg-[#0A0A0A] border border-white/10 rounded-[3rem] p-8 md:p-12 relative">
-              <div className="absolute inset-0 bg-primary/5 blur-3xl rounded-full opacity-50" />
-              <form className="space-y-6 relative z-10">
-                <div className="space-y-2">
-                  <Label className="text-gray-400">Full Name</Label>
-                  <Input placeholder="Enter your name" className="bg-white/5 border-white/10 h-12 focus-visible:ring-primary" />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-gray-400">Email</Label>
-                    <Input type="email" placeholder="email@example.com" className="bg-white/5 border-white/10 h-12 focus-visible:ring-primary" />
+            {/* Dealer CTA */}
+            <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6">
+              <h3 className="font-heading font-bold text-white mb-2">Become a Dealer</h3>
+              <p className="text-gray-400 text-sm mb-4">
+                Interested in stocking Perfect Batteries? Apply for our dealer program and get exclusive pricing.
+              </p>
+              <Link
+                href="/auth/dealer-register"
+                className="inline-block bg-primary text-black font-bold px-5 py-2.5 rounded-xl hover:bg-primary/90 transition-colors text-sm"
+              >
+                Apply Now
+              </Link>
+            </div>
+          </div>
+
+          {/* Contact Form */}
+          <div className="lg:col-span-3">
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
+              <h2 className="text-xl font-heading font-bold text-white mb-6">Send us a Message</h2>
+              <form className="space-y-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Your Name *</label>
+                    <input
+                      type="text"
+                      name="name"
+                      placeholder="John Doe"
+                      required
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                    />
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-gray-400">Phone</Label>
-                    <Input placeholder="+91 00000 00000" className="bg-white/5 border-white/10 h-12 focus-visible:ring-primary" />
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Email Address *</label>
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="you@example.com"
+                      required
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                    />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-gray-400">Subject</Label>
-                  <Input placeholder="Inquiry about..." className="bg-white/5 border-white/10 h-12 focus-visible:ring-primary" />
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Phone Number *</label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    placeholder="9999999999"
+                    required
+                    pattern="[0-9]{10}"
+                    title="Please enter a valid 10-digit phone number"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                  />
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-gray-400">Message</Label>
-                  <Textarea placeholder="How can we help you?" className="bg-white/5 border-white/10 min-h-[150px] focus-visible:ring-primary" />
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Subject *</label>
+                  <select name="subject" required className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors">
+                    <option value="" className="bg-[#111]">Select a topic…</option>
+                    <option value="product" className="bg-[#111]">Product Inquiry</option>
+                    <option value="warranty" className="bg-[#111]">Warranty Support</option>
+                    <option value="dealer" className="bg-[#111]">Dealer Inquiry</option>
+                    <option value="bulk" className="bg-[#111]">Bulk Order</option>
+                    <option value="other" className="bg-[#111]">Other</option>
+                  </select>
                 </div>
-                <Button className="w-full bg-primary text-black font-bold h-14 text-lg hover:bg-primary/90 rounded-2xl group">
-                  Send Message <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Message *</label>
+                  <textarea
+                    name="message"
+                    rows={5}
+                    placeholder="Tell us how we can help you…"
+                    required
+                    minLength={10}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors resize-none"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="flex items-center justify-center gap-2 w-full bg-primary text-black font-heading font-bold py-3.5 rounded-xl hover:bg-primary/90 transition-colors"
+                >
+                  <Send className="w-4 h-4" />
+                  Send Message
+                </button>
               </form>
             </div>
           </div>
         </div>
-      </section>
-
-      {/* Map Section Placeholder */}
-      <section className="h-[400px] bg-white/5 grayscale invert contrast-125 border-y border-white/5">
-        <div className="w-full h-full flex items-center justify-center text-gray-500 font-heading uppercase tracking-[0.5em]">
-          Interactive Map (Coimbatore Factory)
-        </div>
-      </section>
-
+      </div>
       <Footer />
     </main>
   );

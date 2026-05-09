@@ -1,36 +1,140 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CMI Battery Management Platform
 
-## Getting Started
+Enterprise-grade battery manufacturing business platform for **Chinna Mayil Industries** — makers of **Perfect Batteries**.
 
-First, run the development server:
+## 🚀 Quick Start
 
+### 1. Install dependencies
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm install --save-dev tsx   # Required for the seed script
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Configure environment variables
+```bash
+cp .env.example .env.local
+# Fill in all values in .env.local
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Set up the database
+```bash
+# Push schema to Supabase
+npm run db:push
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# OR run migrations (for production)
+npm run db:migrate
 
-## Learn More
+# Generate Prisma client
+npm run db:generate
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 4. Seed the database
+```bash
+npm run db:seed
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+This creates:
+- ✅ 4 product categories
+- ✅ Admin user: `admin@cmibattery.com` / `Admin@CMI2024`
+- ✅ Dealer user: `dealer@abcbatteries.com` / `Dealer@123`
+- ✅ Customer user: `customer@example.com` / `Customer@123`
+- ✅ 5 demo products with specs & inventory
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 5. Start the dev server
+```bash
+npm run dev
+```
 
-## Deploy on Vercel
+Open [http://localhost:3000](http://localhost:3000)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🗂️ Project Structure
+
+```
+src/
+├── app/
+│   ├── (public)         # Home, Products, About, Contact, Warranty
+│   ├── admin/           # Admin dashboard & management
+│   ├── dealer/          # Dealer portal
+│   ├── customer/        # Customer account
+│   ├── cart/            # Shopping cart
+│   ├── checkout/        # Checkout & success
+│   └── api/             # API routes
+├── components/
+│   ├── admin/           # Admin-specific components
+│   ├── dealer/          # Dealer-specific components
+│   ├── shared/          # Navbar, Footer
+│   └── sections/        # Landing page sections
+├── lib/
+│   ├── auth.ts          # NextAuth configuration
+│   ├── db.ts            # Prisma singleton
+│   ├── constants.ts     # App constants
+│   ├── utils/           # Utility functions
+│   └── validations/     # Zod schemas
+├── services/
+│   └── payments/        # Payment abstraction layer
+├── store/
+│   └── cart.tsx         # Cart context/reducer
+├── actions/             # Server actions
+└── types/               # TypeScript augmentations
+```
+
+---
+
+## 👤 Roles & Access
+
+| Role | Access |
+|------|--------|
+| **ADMIN** | Full admin panel — products, orders, dealers, quotations, inventory |
+| **DEALER** | Dealer portal — catalog (dealer pricing), quotations, orders |
+| **CUSTOMER** | Customer dashboard — orders, profile, addresses |
+
+---
+
+## 💳 Payment Architecture
+
+The platform uses a **provider abstraction layer** at `src/services/payments/`:
+
+- **Development/Staging**: Mock provider (auto-approves payments)
+- **Production**: Razorpay provider (set `RAZORPAY_KEY_ID` + `RAZORPAY_SECRET`)
+
+Switching providers is automatic — no code changes required.
+
+---
+
+## 🗃️ Available Scripts
+
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Start dev server |
+| `npm run build` | Build for production |
+| `npm run db:push` | Push schema to database |
+| `npm run db:migrate` | Run migrations |
+| `npm run db:seed` | Seed demo data |
+| `npm run db:studio` | Open Prisma Studio |
+| `npm run type-check` | TypeScript type checking |
+
+---
+
+## 🌐 Deployment (Vercel)
+
+1. Connect your GitHub repo to Vercel
+2. Add all environment variables from `.env.example`
+3. Set **Build Command**: `prisma generate && next build`
+4. Deploy!
+
+> Make sure `NEXTAUTH_URL` is set to your production domain.
+
+---
+
+## 📋 Tech Stack
+
+- **Framework**: Next.js 16 (App Router)
+- **Database**: PostgreSQL via Supabase + Prisma ORM
+- **Auth**: Auth.js (NextAuth v5)
+- **Payments**: Razorpay (with Mock fallback)
+- **Storage**: Cloudinary
+- **UI**: Tailwind CSS + shadcn/ui + Framer Motion
+- **Validation**: Zod + React Hook Form
+- **Deployment**: Vercel

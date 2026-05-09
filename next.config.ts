@@ -1,7 +1,25 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "res.cloudinary.com" },
+      { protocol: "https", hostname: "images.unsplash.com" },
+      { protocol: "https", hostname: "*.supabase.co" },
+      { protocol: "https", hostname: "placehold.co" },
+      { protocol: "https", hostname: "via.placeholder.com" },
+    ],
+  },
+  experimental: {
+    serverActions: {
+      allowedOrigins: [
+        "localhost:3000",
+        process.env.NEXTAUTH_URL ?? "https://cmibattery.com",
+      ],
+    },
+  },
+  // Ensure Prisma is not bundled into edge runtimes
+  serverExternalPackages: ["@prisma/client", "bcryptjs"],
 };
 
 export default nextConfig;

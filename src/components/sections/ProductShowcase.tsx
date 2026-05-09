@@ -3,72 +3,82 @@
 import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { PRODUCTS } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { ArrowUpRight, Zap } from "lucide-react";
 import Link from "next/link";
+import { formatCurrency } from "@/lib/utils/api";
+import { COMPANY_INFO } from "@/lib/constants";
 
-export default function ProductShowcase() {
+type Product = {
+  id: string;
+  name: string;
+  slug: string;
+  shortDesc: string | null;
+  price: number;
+  images: { url: string }[];
+  specs: { label: string; value: string; unit: string | null }[];
+};
+
+export default function ProductShowcase({ products }: { products: Product[] }) {
   return (
-    <section className="py-24 bg-black relative">
+    <section className="py-24 bg-[#050505] relative overflow-hidden">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="flex flex-col md:flex-row justify-between items-end gap-8 mb-16">
-          <div className="max-w-2xl space-y-4">
-            <h2 className="text-primary font-heading font-bold uppercase tracking-widest text-sm">Product Lineup</h2>
-            <h3 className="text-4xl md:text-5xl font-heading font-bold text-white">Power Solutions for Every Need</h3>
-            <p className="text-gray-400">From lightweight vehicle batteries to high-capacity UPS systems, our CMIP series delivers consistent performance.</p>
-          </div>
-          <Link href="/products" className="text-primary p-0 h-auto font-bold group inline-flex items-center">
-            View All Products <ArrowUpRight className="ml-1 w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-          </Link>
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-5xl font-heading font-bold text-white uppercase tracking-widest">
+            Our Products
+          </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {PRODUCTS.map((product, i) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ delay: i * 0.1 }}
-              viewport={{ once: true }}
-              className="group relative overflow-hidden rounded-3xl bg-[#111] border border-white/5 p-6 hover:border-primary/30 transition-all"
-            >
-              <div className="relative aspect-square mb-6 overflow-hidden rounded-2xl bg-black flex items-center justify-center">
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  width={300}
-                  height={300}
-                  className="object-contain group-hover:scale-110 transition-transform duration-500"
-                />
-                <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-primary/20 backdrop-blur-md flex items-center justify-center">
-                  <Zap className="w-4 h-4 text-primary fill-primary" />
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <h4 className="text-lg font-heading font-bold text-white group-hover:text-primary transition-colors">{product.name}</h4>
-                  <p className="text-[10px] text-gray-500 uppercase tracking-widest mt-1">{product.specs.type}</p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4 border-y border-white/5 py-4">
-                  <div className="space-y-1">
-                    <div className="text-xs text-gray-500 uppercase">Voltage</div>
-                    <div className="text-sm font-bold text-white">{product.specs.voltage}</div>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="text-xs text-gray-500 uppercase">Capacity</div>
-                    <div className="text-sm font-bold text-white">{product.specs.capacity}</div>
+        <div className="flex flex-wrap justify-center gap-8 md:gap-12 lg:gap-16">
+          {products.map((product, i) => (
+            <Link href={`/products/${product.slug}`} key={product.id}>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1, duration: 0.5 }}
+                viewport={{ once: true }}
+                className="flex flex-col items-center group cursor-pointer"
+              >
+                {/* Circular Frame */}
+                <div className="relative w-48 h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 rounded-full border-[6px] border-white/10 mb-6 group-hover:shadow-[0_0_40px_rgba(250,255,0,0.2)] transition-shadow duration-500">
+                  {/* Colored Accent Curve */}
+                  <div className="absolute inset-[-6px] border-[6px] border-transparent border-b-primary border-l-primary rounded-full transition-transform duration-700 ease-in-out group-hover:rotate-180" />
+                  
+                  {/* Inner White Background (as seen in screenshot) */}
+                  <div className="absolute inset-2 bg-white rounded-full flex items-center justify-center p-6 overflow-hidden">
+                    <Image
+                      src={product.images[0]?.url || COMPANY_INFO.logo}
+                      alt={product.name}
+                      width={200}
+                      height={200}
+                      className="object-contain w-full h-full group-hover:scale-110 transition-transform duration-500"
+                    />
                   </div>
                 </div>
 
-                <Button className="w-full bg-white/5 hover:bg-primary hover:text-black text-white font-bold transition-all border border-white/10 hover:border-primary">
-                  Learn More
-                </Button>
-              </div>
-            </motion.div>
+                {/* Optional Product Name Below (Keeps it accessible) */}
+                <h3 className="text-white font-heading font-bold text-lg md:text-xl uppercase tracking-wider group-hover:text-primary transition-colors text-center max-w-[200px] line-clamp-2">
+                  {product.name}
+                </h3>
+              </motion.div>
+            </Link>
           ))}
+
+          {products.length === 0 && (
+            <div className="w-full py-12 text-center text-gray-500 border border-dashed border-white/10 rounded-3xl">
+              No products found in the database. Run the seed script!
+            </div>
+          )}
+          {products.length > 0 && (
+            <div className="w-full mt-16 flex justify-center">
+              <Link href="/products">
+                <Button className="bg-primary text-black font-heading font-bold text-sm px-8 py-6 rounded-xl hover:bg-primary/90 transition-colors flex items-center gap-2 group">
+                  VIEW ALL PRODUCTS
+                  <ArrowUpRight className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </section>

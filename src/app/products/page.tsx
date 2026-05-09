@@ -1,95 +1,227 @@
-"use client";
-
-import React, { useState } from "react";
+import { db } from "@/lib/db";
+import type { Metadata } from "next";
+import Link from "next/link";
+import Image from "next/image";
+import { Package, SlidersHorizontal, Search } from "lucide-react";
+import { formatCurrency } from "@/lib/utils/api";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
-import Image from "next/image";
-import { PRODUCTS } from "@/lib/constants";
-import { Button } from "@/components/ui/button";
-import { Zap, Shield, Battery, Download, MessageCircle, Filter, ArrowRight } from "lucide-react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 
-export default function ProductsPage() {
-  const [activeTab, setActiveTab] = useState("all");
+export const metadata: Metadata = {
+  title: "Products | Perfect Batteries",
+  description: "Browse our full range of high-performance non-maintenance lithium batteries for vehicles, inverters, and UPS systems.",
+};
+
+interface PageProps {
+  searchParams: Promise<{
+    search?: string;
+    category?: string;
+    page?: string;
+    sort?: string;
+  }>;
+}
+
+async function getProducts(searchParams: Awaited<PageProps["searchParams"]>) {
+  const page = Number(searchParams.page ?? 1);
+  const limit = 12;
+  const search = searchParams.search ?? "";
+  const categoryId = searchParams.category ?? undefined;
+  const [sortBy, sortDir] = (searchParams.sort ?? "createdAt:desc").split(":");
+
+  const where = {
+    isActive: true,
+    ...(categoryId && { categoryId }),
+    ...(search && {
+      OR: [
+        { name: { contains: search, mode: "insensitive" as const } },
+        { sku: { contains: search, mode: "insensitive" as const } },
+        { shortDesc: { contains: search, mode: "insensitive" as const } },
+      ],
+    }),
+  };
+
+  const [products, total, categories] = await Promise.all([
+    db.product.findMany({
+      where,
+      include: {
+        images: { where: { isPrimary: true }, take: 1 },
+        category: { select: { id: true, name: true } },
+        inventory: { select: { quantity: true } },
+      },
+      orderBy: { [sortBy ?? "createdAt"]: sortDir ?? "desc" },
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+    db.product.count({ where }),
+    db.category.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } }),
+  ]);
+
+  return { products, total, categories, page, totalPages: Math.ceil(total / limit) };
+}
+
+export default async function ProductsPage({ searchParams }: PageProps) {
+  const params = await searchParams;
+  const { products, total, categories, page, totalPages } = await getProducts(params);
 
   return (
-    <main className="min-h-screen pt-20 bg-black">
+    <main className="min-h-screen bg-[#0A0A0A]">
       <Navbar />
-      
-      <section className="py-20 border-b border-white/5 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-full bg-grid opacity-20" />
-        <div className="container mx-auto px-4 md:px-6 relative z-10 text-center">
-          <h1 className="text-5xl md:text-7xl font-heading font-bold text-white mb-6">Our <span className="text-primary">Power</span> Solutions</h1>
-          <p className="text-gray-400 max-w-2xl mx-auto text-lg">
-            High-performance, non-maintenance lithium batteries engineered for vehicles, UPS, and industrial applications.
-          </p>
+      {/* Header */}
+      <section className="bg-gradient-to-b from-black to-[#0A0A0A] border-b border-white/5 pt-32 pb-16 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center gap-2 text-gray-500 text-sm mb-4">
+            <Link href="/" className="hover:text-primary transition-colors">Home</Link>
+            <span>/</span>
+            <span className="text-white">Products</span>
+          </div>
+          <h1 className="text-4xl font-heading font-bold text-white">Our Product Range</h1>
+          <p className="text-gray-400 mt-2">{total} products available</p>
         </div>
       </section>
 
-      <section className="py-20">
-        <div className="container mx-auto px-4 md:px-6">
-          <Tabs defaultValue="all" className="w-full mb-12">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
-              <TabsList className="bg-white/5 border border-white/10 p-1 rounded-full">
-                <TabsTrigger value="all" className="rounded-full px-8 data-[state=active]:bg-primary data-[state=active]:text-black">All</TabsTrigger>
-                <TabsTrigger value="vehicle" className="rounded-full px-8 data-[state=active]:bg-primary data-[state=active]:text-black">Vehicle</TabsTrigger>
-                <TabsTrigger value="ups" className="rounded-full px-8 data-[state=active]:bg-primary data-[state=active]:text-black">UPS Systems</TabsTrigger>
-              </TabsList>
-              
-              <div className="flex gap-4">
-                <Button variant="outline" className="border-white/10 text-white rounded-full">
-                  <Download className="mr-2 w-4 h-4" /> Brochure
-                </Button>
-                <Button className="bg-primary text-black rounded-full font-bold">
-                  Compare Models
-                </Button>
+      <div className="max-w-7xl mx-auto px-4 py-10">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Sidebar filters */}
+          <aside className="w-full lg:w-64 shrink-0">
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-5 sticky top-24">
+              <div className="flex items-center gap-2 mb-4">
+                <SlidersHorizontal className="w-4 h-4 text-primary" />
+                <span className="font-heading font-bold text-white text-sm uppercase tracking-widest">Filters</span>
               </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {PRODUCTS.map((product) => (
-                <div key={product.id} className="group bg-[#0A0A0A] border border-white/5 rounded-[2.5rem] p-8 hover:border-primary/50 transition-all flex flex-col">
-                  <div className="relative aspect-square mb-8 bg-[#111] rounded-[2rem] flex items-center justify-center overflow-hidden">
-                    <Image src={product.image} alt={product.name} width={300} height={300} className="object-contain group-hover:scale-110 transition-transform duration-500" />
-                    <Badge className="absolute top-4 left-4 bg-primary text-black font-bold border-none">LITHIUM-ION</Badge>
-                  </div>
-
-                  <div className="flex-1 space-y-6">
-                    <div>
-                      <h3 className="text-2xl font-heading font-bold text-white mb-2">{product.name}</h3>
-                      <p className="text-gray-500 text-sm">{product.specs.application}</p>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-y-4">
-                      <div className="space-y-1">
-                        <div className="text-[10px] text-gray-500 uppercase tracking-widest">Voltage</div>
-                        <div className="text-lg font-bold text-white flex items-center gap-2">
-                          <Battery className="w-4 h-4 text-primary" /> {product.specs.voltage}
-                        </div>
-                      </div>
-                      <div className="space-y-1">
-                        <div className="text-[10px] text-gray-500 uppercase tracking-widest">Capacity</div>
-                        <div className="text-lg font-bold text-white flex items-center gap-2">
-                          <Zap className="w-4 h-4 text-primary" /> {product.specs.capacity}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="pt-6 border-t border-white/5 flex gap-3">
-                      <Button className="flex-1 bg-white/5 hover:bg-primary hover:text-black border-white/10">Inquiry</Button>
-                      <Button size="icon" className="bg-[#25D366] text-white hover:bg-[#25D366]/80 shrink-0">
-                        <MessageCircle className="w-5 h-5 fill-white" />
-                      </Button>
-                    </div>
-                  </div>
+              {/* Search */}
+              <form className="mb-5">
+                <label className="block text-xs text-gray-400 uppercase tracking-widest mb-2">Search</label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                  <input
+                    name="search"
+                    defaultValue={params.search}
+                    placeholder="Battery name, SKU…"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-primary transition-colors"
+                  />
                 </div>
-              ))}
-            </div>
-          </Tabs>
-        </div>
-      </section>
 
+                {/* Category */}
+                <label className="block text-xs text-gray-400 uppercase tracking-widest mb-2 mt-4">Category</label>
+                <select
+                  name="category"
+                  defaultValue={params.category ?? ""}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-primary transition-colors"
+                >
+                  <option value="">All Categories</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id} className="bg-[#111]">{c.name}</option>
+                  ))}
+                </select>
+
+                {/* Sort */}
+                <label className="block text-xs text-gray-400 uppercase tracking-widest mb-2 mt-4">Sort By</label>
+                <select
+                  name="sort"
+                  defaultValue={params.sort ?? "createdAt:desc"}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-primary transition-colors"
+                >
+                  <option value="createdAt:desc" className="bg-[#111]">Newest First</option>
+                  <option value="createdAt:asc" className="bg-[#111]">Oldest First</option>
+                  <option value="price:asc" className="bg-[#111]">Price: Low to High</option>
+                  <option value="price:desc" className="bg-[#111]">Price: High to Low</option>
+                  <option value="name:asc" className="bg-[#111]">Name: A–Z</option>
+                </select>
+
+                <button
+                  type="submit"
+                  className="w-full bg-primary text-black font-bold py-2.5 rounded-xl mt-4 hover:bg-primary/90 transition-colors text-sm"
+                >
+                  Apply Filters
+                </button>
+              </form>
+            </div>
+          </aside>
+
+          {/* Product grid */}
+          <div className="flex-1">
+            {products.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-24 text-center">
+                <Package className="w-12 h-12 text-gray-600 mb-4" />
+                <h3 className="text-xl font-heading font-bold text-white">No Products Found</h3>
+                <p className="text-gray-400 mt-1">Try adjusting your filters</p>
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                  {products.map((product) => {
+                    const primaryImage = product.images[0]?.url;
+                    const inStock = (product.inventory?.quantity ?? 0) > 0;
+
+                    return (
+                      <Link key={product.id} href={`/products/${product.slug}`}>
+                        <div className="group bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-primary/40 hover:bg-white/8 transition-all duration-300">
+                          <div className="aspect-video bg-white/5 relative overflow-hidden">
+                            {primaryImage ? (
+                              <Image
+                                src={primaryImage}
+                                alt={product.name}
+                                fill
+                                className="object-contain p-4 group-hover:scale-105 transition-transform duration-500"
+                              />
+                            ) : (
+                              <div className="flex items-center justify-center h-full">
+                                <Package className="w-12 h-12 text-gray-700" />
+                              </div>
+                            )}
+                            {!inStock && (
+                              <div className="absolute top-3 left-3 bg-red-500/80 text-white text-xs font-bold px-2 py-1 rounded-lg">
+                                Out of Stock
+                              </div>
+                            )}
+                          </div>
+                          <div className="p-5">
+                            <div className="text-xs text-primary font-mono uppercase tracking-widest mb-1">
+                              {product.category.name}
+                            </div>
+                            <h3 className="font-heading font-bold text-white group-hover:text-primary transition-colors line-clamp-2">
+                              {product.name}
+                            </h3>
+                            {product.shortDesc && (
+                              <p className="text-gray-400 text-sm mt-1 line-clamp-2">{product.shortDesc}</p>
+                            )}
+                            <div className="mt-4 flex items-center justify-between">
+                              <span className="text-xl font-heading font-bold text-primary">
+                                {formatCurrency(Number(product.price))}
+                              </span>
+                              <span className="text-xs text-gray-500 font-mono">{product.sku}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-center gap-2 mt-10">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                      <Link
+                        key={p}
+                        href={`/products?${new URLSearchParams({ ...params, page: String(p) })}`}
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-medium transition-colors ${
+                          p === page
+                            ? "bg-primary text-black"
+                            : "bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10"
+                        }`}
+                      >
+                        {p}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </div>
       <Footer />
     </main>
   );

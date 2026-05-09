@@ -11,13 +11,15 @@ export default function Footer() {
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           <div className="space-y-6">
-            <Link href="/" className="flex items-center gap-2">
-              <Zap className="w-8 h-8 text-primary fill-primary" />
+            <Link href="/" className="flex items-center gap-6">
+              <div className="relative w-28 h-28">
+                <img src={COMPANY_INFO.logo} alt="CMI Logo" className="object-contain w-full h-full" />
+              </div>
               <div className="flex flex-col">
-                <span className="font-heading font-bold text-xl tracking-tighter leading-none">
+                <span className="font-heading font-bold text-4xl tracking-tighter leading-none text-white">
                   PERFECT
                 </span>
-                <span className="text-[10px] text-primary font-bold tracking-[0.2em] uppercase leading-none">
+                <span className="text-base mt-1 text-primary font-bold tracking-[0.2em] uppercase leading-none">
                   BATTERIES
                 </span>
               </div>
@@ -82,8 +84,8 @@ export default function Footer() {
             © {new Date().getFullYear()} {COMPANY_INFO.name}. All rights reserved. Designed for the Future.
           </p>
           <div className="flex gap-8">
-            <Link href="#" className="text-gray-500 hover:text-gray-300 text-xs">Privacy Policy</Link>
-            <Link href="#" className="text-gray-500 hover:text-gray-300 text-xs">Terms of Service</Link>
+            <Link href="/privacy" className="text-gray-500 hover:text-gray-300 text-xs">Privacy Policy</Link>
+            <Link href="/terms" className="text-gray-500 hover:text-gray-300 text-xs">Terms of Service</Link>
           </div>
         </div>
       </div>
