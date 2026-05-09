@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { registerSchema } from "@/lib/validations";
-import { apiSuccess, apiError, apiValidationError } from "@/lib/utils/api";
+import { apiSuccess, apiError } from "@/lib/utils/api";
 
 export async function POST(req: Request) {
   try {
@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     const validated = registerSchema.safeParse(body);
 
     if (!validated.success) {
-      return apiValidationError(validated.error);
+      return apiError(validated.error.errors[0].message, 400);
     }
 
     const { name, email, password, phone } = validated.data;
