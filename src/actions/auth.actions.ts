@@ -42,7 +42,7 @@ export async function loginAction(data: LoginInput) {
 export async function registerAction(data: RegisterInput) {
   const validated = registerSchema.safeParse(data);
   if (!validated.success) {
-    return { error: validated.error.errors[0].message };
+    return { error: validated.error.issues[0].message };
   }
 
   const { name, email, phone, password } = validated.data;
@@ -76,7 +76,7 @@ export async function registerAction(data: RegisterInput) {
 export async function dealerRegisterAction(data: DealerRegisterInput) {
   const validated = dealerRegisterSchema.safeParse(data);
   if (!validated.success) {
-    return { error: validated.error.errors[0].message };
+    return { error: validated.error.issues[0].message };
   }
 
   const {

@@ -17,7 +17,6 @@ if (!process.env.DIRECT_URL) {
 }
 
 export default defineConfig({
-  earlyAccess: true,
   datasource: {
     // CLI operations (like db push/migrate) MUST use the Direct URL (Port 5432)
     // and not the connection pooler URL (Port 6543), otherwise the CLI hangs indefinitely.

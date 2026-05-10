@@ -28,7 +28,7 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const validated = categorySchema.safeParse(body);
-    if (!validated.success) return apiError(validated.error.errors[0].message, 400);
+    if (!validated.success) return apiError(validated.error.issues[0].message, 400);
 
     const data = validated.data;
     const slug = data.slug || slugify(data.name);
@@ -56,7 +56,7 @@ export async function PATCH(request: Request) {
     if (!id) return apiError("Category ID required", 400);
 
     const validated = categorySchema.partial().safeParse(rest);
-    if (!validated.success) return apiError(validated.error.errors[0].message, 400);
+    if (!validated.success) return apiError(validated.error.issues[0].message, 400);
 
     const category = await db.category.update({ where: { id }, data: validated.data });
     return apiSuccess(category);

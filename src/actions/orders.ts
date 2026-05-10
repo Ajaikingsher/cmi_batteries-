@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { actionSuccess, actionError, generateOrderNumber, type ActionResult } from "@/lib/utils/api";
 import { checkoutSchema } from "@/lib/validations";
-import { getPaymentService } from "@/services/payments/payment-service";
+import { paymentService } from "@/services/payments/payment-service";
 import { revalidatePath } from "next/cache";
 
 // ============================================================
@@ -63,10 +63,13 @@ export async function createOrder(
   const shippingAmount = subtotal >= 5000 ? 0 : 150; // Free shipping over ₹5000
   const totalAmount = subtotal + taxAmount + shippingAmount;
 
+  // Generate sequential order number
+  const orderCount = await db.order.count();
+
   // Create order in DB
   const order = await db.order.create({
     data: {
-      orderNumber: generateOrderNumber(),
+      orderNumber: generateOrderNumber(orderCount + 1),
       userId: session.user.id,
       status: "PENDING",
       paymentStatus: "PENDING",
@@ -91,18 +94,7 @@ export async function createOrder(
   });
 
   // Create payment order with provider
-  const paymentService = getPaymentService();
-  const paymentOrder = await paymentService.createOrder({
-    amount: totalAmount,
-    orderId: order.id,
-    metadata: { orderNumber: order.orderNumber },
-  });
-
-  // Update payment with provider order ID
-  await db.payment.update({
-    where: { orderId: order.id },
-    data: { providerOrderId: paymentOrder.id },
-  });
+  const paymentOrder = await paymentService.createPayment(order.id);
 
   revalidatePath("/customer/orders");
   return actionSuccess({ orderId: order.id, paymentOrder });
@@ -121,37 +113,16 @@ export async function verifyPayment(params: {
   const session = await auth();
   if (!session?.user) return actionError("Unauthorized");
 
-  const paymentService = getPaymentService();
   const result = await paymentService.verifyPayment({
+    orderId: params.orderId,
     providerOrderId: params.providerOrderId,
     providerPaymentId: params.providerPaymentId,
     signature: params.signature,
   });
 
   if (!result.success) {
-    await db.payment.update({
-      where: { orderId: params.orderId },
-      data: { status: "FAILED", failureReason: result.error },
-    });
     return actionError("Payment verification failed");
   }
-
-  // Mark order and payment as paid
-  await db.$transaction([
-    db.payment.update({
-      where: { orderId: params.orderId },
-      data: {
-        status: "PAID",
-        providerPaymentId: params.providerPaymentId,
-        providerSignature: params.signature,
-        paidAt: new Date(),
-      },
-    }),
-    db.order.update({
-      where: { id: params.orderId },
-      data: { status: "CONFIRMED", paymentStatus: "PAID" },
-    }),
-  ]);
 
   revalidatePath("/customer/orders");
   return actionSuccess(undefined, "Payment successful");

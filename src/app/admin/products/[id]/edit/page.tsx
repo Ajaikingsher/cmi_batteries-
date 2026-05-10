@@ -43,10 +43,11 @@ export default async function EditProductPage({ params }: PageProps) {
     metaDesc: product.metaDesc ?? "",
     isActive: product.isActive,
     isFeatured: product.isFeatured,
-    images: product.images.map((img) => ({ 
+    images: product.images.map((img, i) => ({ 
       url: img.url, 
       isPrimary: img.isPrimary,
-      publicId: img.publicId 
+      publicId: img.publicId,
+      sortOrder: img.sortOrder ?? i,
     })),
     specs: product.specs.map((s) => ({
       label: s.label,

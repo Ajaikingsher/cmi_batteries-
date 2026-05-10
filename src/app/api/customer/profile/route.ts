@@ -36,7 +36,7 @@ export async function PATCH(request: Request) {
 
     const body = await request.json();
     const validated = profileUpdateSchema.safeParse(body);
-    if (!validated.success) return apiError(validated.error.errors[0].message, 400);
+    if (!validated.success) return apiError(validated.error.issues[0].message, 400);
 
     const { name, phone } = validated.data;
 

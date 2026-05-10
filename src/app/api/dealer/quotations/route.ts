@@ -52,7 +52,7 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const validated = quotationRequestSchema.safeParse(body);
-    if (!validated.success) return apiError(validated.error.errors[0].message, 400);
+    if (!validated.success) return apiError(validated.error.issues[0].message, 400);
 
     const { notes, items } = validated.data;
 

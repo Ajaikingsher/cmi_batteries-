@@ -50,12 +50,12 @@ export const paymentService = {
         status: "PENDING",
         amount: result.amount,
         currency: result.currency,
-        metadata: result.metadata ?? {},
+        metadata: (result.metadata ?? {}) as object,
       },
       update: {
         provider: result.provider as "RAZORPAY" | "MOCK",
         providerOrderId: result.providerOrderId,
-        metadata: result.metadata ?? {},
+        metadata: (result.metadata ?? {}) as object,
       },
     });
 

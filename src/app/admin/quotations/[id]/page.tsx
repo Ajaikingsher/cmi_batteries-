@@ -100,7 +100,7 @@ export default async function AdminQuotationDetailPage({ params }: { params: Pro
                     </td>
                     <td className="p-4 text-center text-white">{item.quantity}</td>
                     <td className="p-4 text-right text-gray-300">{formatCurrency(Number(item.unitPrice))}</td>
-                    <td className="p-4 text-right text-white font-medium">{formatCurrency(Number(item.subtotal))}</td>
+                    <td className="p-4 text-right text-white font-medium">{formatCurrency(Number(item.totalPrice))}</td>
                   </tr>
                 ))}
               </tbody>
@@ -136,12 +136,12 @@ export default async function AdminQuotationDetailPage({ params }: { params: Pro
                 </div>
               </div>
               
-              {quotation.dealerNotes && (
+              {quotation.notes && (
                 <div className="bg-white/5 p-3 rounded-xl border border-white/5">
                   <p className="text-gray-500 text-xs uppercase tracking-widest mb-1 flex items-center gap-1">
                     <AlertTriangle className="w-3 h-3" /> Dealer Notes
                   </p>
-                  <p className="text-gray-300 text-sm italic">"{quotation.dealerNotes}"</p>
+                  <p className="text-gray-300 text-sm italic">"{quotation.notes}"</p>
                 </div>
               )}
             </div>

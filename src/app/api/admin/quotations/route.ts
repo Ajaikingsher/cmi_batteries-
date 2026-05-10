@@ -52,7 +52,7 @@ export async function PATCH(request: Request) {
     if (!id) return apiError("Quotation ID is required", 400);
 
     const validated = quotationApprovalSchema.safeParse(rest);
-    if (!validated.success) return apiError(validated.error.errors[0].message, 400);
+    if (!validated.success) return apiError(validated.error.issues[0].message, 400);
 
     const { status, adminNotes, validUntil, items } = validated.data;
 

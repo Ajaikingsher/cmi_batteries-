@@ -61,7 +61,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const validated = productSchema.safeParse(body);
     if (!validated.success) {
-      return apiError(validated.error.errors[0].message, 400);
+      return apiError(validated.error.issues[0].message, 400);
     }
 
     const data = validated.data;

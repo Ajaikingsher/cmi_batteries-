@@ -132,9 +132,11 @@ export async function requestQuotation(formData: unknown): Promise<ActionResult>
   const subtotal = items.reduce((s, i) => s + i.unitPrice * i.quantity, 0);
   const taxAmount = items.reduce((s, i) => s + i.taxAmount, 0);
 
+  const quotationCount = await db.quotation.count();
+
   await db.quotation.create({
     data: {
-      quotationNo: generateQuotationNumber(),
+      quotationNo: generateQuotationNumber(quotationCount + 1),
       dealerId: dealer.id,
       notes: validated.data.notes,
       subtotal,
