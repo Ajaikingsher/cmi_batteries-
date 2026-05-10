@@ -67,7 +67,7 @@ export async function POST(request: Request) {
       return apiError("One or more products are invalid or inactive", 400);
     }
 
-    const productMap = new Map(products.map((p) => [p.id, p]));
+    const productMap = new Map<string, typeof products[0]>(products.map((p) => [p.id, p]));
 
     // Generate quotation number
     const count = await db.quotation.count();
