@@ -1,10 +1,10 @@
 "use server";
 
 import { db } from "@/lib/db";
+import type { DbTransaction } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { signIn, signOut } from "@/lib/auth";
 import { AuthError } from "next-auth";
-import type { Prisma } from "@prisma/client";
 import { loginSchema, registerSchema, dealerRegisterSchema } from "@/lib/validations/auth";
 import type { LoginInput, RegisterInput, DealerRegisterInput } from "@/lib/validations/auth";
 
@@ -105,7 +105,7 @@ export async function dealerRegisterAction(data: DealerRegisterInput) {
 
   const hashedPassword = await bcrypt.hash(password, 12);
 
-  await db.$transaction(async (tx: Prisma.TransactionClient) => {
+  await db.$transaction(async (tx: DbTransaction) => {
     const user = await tx.user.create({
       data: {
         name,

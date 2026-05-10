@@ -1,8 +1,8 @@
 import { db } from "@/lib/db";
+import type { DbTransaction } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiSuccess, apiError } from "@/lib/utils/api";
 import { quotationApprovalSchema } from "@/lib/validations/order";
-import type { Prisma } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
@@ -57,7 +57,7 @@ export async function PATCH(request: Request) {
 
     const { status, adminNotes, validUntil, items } = validated.data;
 
-    const quotation = await db.$transaction(async (tx: Prisma.TransactionClient) => {
+    const quotation = await db.$transaction(async (tx: DbTransaction) => {
       // Update line item prices if admin modified them
       if (items && items.length > 0) {
         for (const item of items) {

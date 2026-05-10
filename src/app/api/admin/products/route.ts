@@ -1,8 +1,8 @@
 import { db } from "@/lib/db";
+import type { DbTransaction } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiSuccess, apiError, slugify } from "@/lib/utils/api";
 import { productSchema } from "@/lib/validations/product";
-import type { Prisma } from "@prisma/client";
 import { z } from "zod";
 
 // GET all products (admin — includes inactive)
@@ -77,7 +77,7 @@ export async function POST(request: Request) {
     if (existingSlug) return apiError("A product with this slug already exists", 409);
     if (existingSku) return apiError("A product with this SKU already exists", 409);
 
-    const product = await db.$transaction(async (tx: Prisma.TransactionClient) => {
+    const product = await db.$transaction(async (tx: DbTransaction) => {
       const p = await tx.product.create({
         data: {
           name: data.name,

@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
+import type { DbTransaction } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiSuccess, apiError, generateOrderNumber } from "@/lib/utils/api";
-import type { Prisma } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
@@ -92,7 +92,7 @@ export async function POST(request: Request) {
     const shippingAmount = subtotal >= 5000 ? 0 : 150;
     const totalAmount = subtotal + taxAmount + shippingAmount;
 
-    const order = await db.$transaction(async (tx: Prisma.TransactionClient) => {
+    const order = await db.$transaction(async (tx: DbTransaction) => {
       const o = await tx.order.create({
         data: {
           orderNumber,
