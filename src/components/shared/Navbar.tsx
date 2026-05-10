@@ -90,13 +90,13 @@ export default function Navbar() {
       >
         <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-6">
-            <motion.div layoutId="logo-image" className="relative w-28 h-28">
+          <Link href="/" className="flex items-center gap-2 md:gap-6">
+            <motion.div layoutId="logo-image" className="relative w-14 h-14 md:w-28 md:h-28">
               <img src={COMPANY_INFO.logo} alt="CMI Logo" className="object-contain w-full h-full" />
             </motion.div>
             <motion.div layoutId="logo-text" className="flex flex-col">
-              <span className="font-heading font-bold text-4xl tracking-tighter leading-none text-white">PERFECT</span>
-              <span className="text-base mt-1 text-primary font-bold tracking-[0.2em] uppercase leading-none">BATTERIES</span>
+              <span className="font-heading font-bold text-2xl md:text-4xl tracking-tighter leading-none text-white">PERFECT</span>
+              <span className="text-xs md:text-base mt-1 text-primary font-bold tracking-[0.2em] uppercase leading-none">BATTERIES</span>
             </motion.div>
           </Link>
 
