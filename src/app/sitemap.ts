@@ -16,18 +16,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/terms`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
   ];
 
-  // Dynamic product pages
-  const products = await db.product.findMany({
-    where: { isActive: true },
-    select: { slug: true, updatedAt: true },
-  });
-
-  const productPages: MetadataRoute.Sitemap = products.map((p) => ({
-    url: `${BASE_URL}/products/${p.slug}`,
-    lastModified: p.updatedAt,
-    changeFrequency: "weekly" as const,
-    priority: 0.8,
-  }));
+  // Dynamic product pages — gracefully skip if DB is unavailable at build time
+  let productPages: MetadataRoute.Sitemap = [];
+  try {
+    const products = await db.product.findMany({
+      where: { isActive: true },
+      select: { slug: true, updatedAt: true },
+    });
+    productPages = products.map((p) => ({
+      url: `${BASE_URL}/products/${p.slug}`,
+      lastModified: p.updatedAt,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    }));
+  } catch {
+    // DB not available during build — return static pages only
+  }
 
   return [...staticPages, ...productPages];
 }
