@@ -3,7 +3,6 @@
 import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import { ArrowUpRight, Zap } from "lucide-react";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/utils/api";
@@ -71,11 +70,9 @@ export default function ProductShowcase({ products }: { products: Product[] }) {
           )}
           {products.length > 0 && (
             <div className="w-full mt-16 flex justify-center">
-              <Link href="/products">
-                <Button className="bg-primary text-black font-heading font-bold text-sm px-8 py-6 rounded-xl hover:bg-primary/90 transition-colors flex items-center gap-2 group">
-                  VIEW ALL PRODUCTS
-                  <ArrowUpRight className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                </Button>
+              <Link href="/products" className="inline-flex items-center justify-center bg-primary text-black font-heading font-bold text-sm px-8 h-12 rounded-xl hover:bg-primary/90 transition-colors group gap-2">
+                VIEW ALL PRODUCTS
+                <ArrowUpRight className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
               </Link>
             </div>
           )}

@@ -3,7 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Zap, ChevronRight, MessageSquare } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function CTA() {
   return (
@@ -25,12 +25,12 @@ export default function CTA() {
               Join our network of 500+ dealers or request a custom quote for your industrial requirements today.
             </p>
             <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
-              <Button size="lg" className="bg-black text-primary hover:bg-black/90 font-bold h-14 px-8 rounded-full">
+              <Link href="/contact" className="inline-flex items-center justify-center bg-black text-primary hover:bg-black/90 font-bold h-14 px-8 rounded-full transition-colors">
                 Get a Quote <ChevronRight className="ml-2 w-5 h-5" />
-              </Button>
-              <Button size="lg" variant="outline" className="border-black/20 hover:bg-black/5 text-black font-bold h-14 px-8 rounded-full">
+              </Link>
+              <Link href="/contact" className="inline-flex items-center justify-center border-2 border-black/20 hover:bg-black/5 text-black font-bold h-14 px-8 rounded-full transition-colors">
                 Contact Sales
-              </Button>
+              </Link>
             </div>
           </div>
 

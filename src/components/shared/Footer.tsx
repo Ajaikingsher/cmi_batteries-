@@ -4,6 +4,7 @@ import { Zap, Globe, MessageSquare, Mail, Phone, MapPin } from "lucide-react";
 import { COMPANY_INFO, NAV_LINKS } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import CurrentYear from "@/components/shared/CurrentYear";
 
 export default function Footer() {
   return (
@@ -81,7 +82,7 @@ export default function Footer() {
 
         <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-gray-500 text-xs text-center md:text-left">
-            © {new Date().getFullYear()} {COMPANY_INFO.name}. All rights reserved. Designed for the Future.
+            © <CurrentYear /> {COMPANY_INFO.name}. All rights reserved. Designed for the Future.
           </p>
           <div className="flex gap-8">
             <Link href="/privacy" className="text-gray-500 hover:text-gray-300 text-xs">Privacy Policy</Link>

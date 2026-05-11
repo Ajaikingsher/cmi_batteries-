@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { SessionProvider } from "next-auth/react";
 import { CartProvider } from "@/store/cart";
 import { auth } from "@/lib/auth";
+import Providers from "@/components/Providers";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -67,16 +68,20 @@ export default async function RootLayout({
   const isDealer = session?.user?.role === "DEALER";
 
   return (
-    <html lang="en" className="dark" style={{ colorScheme: "dark" }}>
+    <html lang="en" className="dark" style={{ colorScheme: "dark" }} suppressHydrationWarning>
+      <head />
       <body
         className={`${inter.variable} ${orbitron.variable} font-sans bg-background text-foreground antialiased`}
+        suppressHydrationWarning
       >
-        <SessionProvider session={session}>
-          <CartProvider isDealer={isDealer}>
-            {children}
-            <Toaster position="bottom-right" theme="dark" richColors />
-          </CartProvider>
-        </SessionProvider>
+        <Providers>
+          <SessionProvider session={session}>
+            <CartProvider isDealer={isDealer}>
+              {children}
+              <Toaster position="bottom-right" theme="dark" richColors />
+            </CartProvider>
+          </SessionProvider>
+        </Providers>
       </body>
     </html>
   );
