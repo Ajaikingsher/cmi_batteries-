@@ -139,9 +139,6 @@ export default function CompanyGallery() {
               <Link href="/contact" className="bg-primary text-black font-heading font-bold px-8 py-4 rounded-2xl hover:bg-white transition-all shadow-xl">
                 CONTACT US
               </Link>
-              <button className="bg-white/5 border border-white/10 text-white font-heading font-bold px-8 py-4 rounded-2xl hover:bg-white/10 transition-all uppercase tracking-widest text-sm">
-                Request Quote
-              </button>
               <Link href="/auth/dealer-register" className="border border-primary text-primary font-heading font-bold px-8 py-4 rounded-2xl hover:bg-primary hover:text-black transition-all uppercase tracking-widest text-sm">
                 Become a Dealer
               </Link>
