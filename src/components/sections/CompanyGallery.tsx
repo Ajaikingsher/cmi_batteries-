@@ -1,10 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 
 const GALLERY_IMAGES = [
   {
@@ -34,7 +33,7 @@ const GALLERY_IMAGES = [
 ];
 
 export default function CompanyGallery() {
-  const [selectedImage, setSelectedImage] = React.useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   return (
     <section className="py-24 bg-[#050505] relative overflow-hidden">
@@ -191,4 +190,3 @@ export default function CompanyGallery() {
     </section>
   );
 }
-

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useCart } from "@/store/cart";
 import Link from "next/link";
 import Image from "next/image";
