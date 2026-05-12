@@ -11,6 +11,7 @@ import {
 import { COMPANY_INFO } from "@/lib/constants";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
+import AddToCartButton from "@/components/products/AddToCartButton";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -95,6 +96,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
                   src={primaryImage.url}
                   alt={primaryImage.altText ?? product.name}
                   fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
                   className="object-contain p-8"
                   priority
                 />
@@ -111,7 +113,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
                     key={img.id}
                     className="aspect-square bg-white/5 border border-white/10 rounded-xl overflow-hidden relative cursor-pointer hover:border-primary/50 transition-colors"
                   >
-                    <Image src={img.url} alt={img.altText ?? product.name} fill className="object-contain p-2" />
+                    <Image src={img.url} alt={img.altText ?? product.name} fill sizes="120px" className="object-contain p-2" />
                   </div>
                 ))}
               </div>
@@ -168,13 +170,16 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
             {/* Actions */}
             <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                disabled={!inStock}
-                className="flex-1 flex items-center justify-center gap-2 bg-primary text-black font-heading font-bold py-4 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                <ShoppingCart className="w-5 h-5" />
-                Add to Cart
-              </button>
+              <AddToCartButton 
+                inStock={inStock} 
+                product={{
+                  id: product.id,
+                  name: product.name,
+                  price: Number(product.price),
+                  dealerPrice: Number(product.dealerPrice),
+                  taxRate: Number(product.taxRate),
+                }} 
+              />
               {product.datasheetUrl && (
                 <a
                   href={product.datasheetUrl}
@@ -248,7 +253,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
                   <div className="group bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-primary/40 transition-all">
                     <div className="aspect-square bg-white/5 relative">
                       {rel.images[0] ? (
-                        <Image src={rel.images[0].url} alt={rel.name} fill className="object-contain p-4 group-hover:scale-105 transition-transform" />
+                        <Image src={rel.images[0].url} alt={rel.name} fill sizes="(max-width: 768px) 50vw, 250px" className="object-contain p-4 group-hover:scale-105 transition-transform" />
                       ) : (
                         <div className="flex items-center justify-center h-full">
                           <Package className="w-8 h-8 text-gray-700" />

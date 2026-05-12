@@ -13,10 +13,11 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const PUBLIC_NAV = [
   { name: "Home", href: "/" },
-  { name: "Products", href: "/products" },
   { name: "About", href: "/about" },
-  { name: "Services", href: "/services" },
+  { name: "Products", href: "/products" },
   { name: "Warranty", href: "/warranty" },
+  { name: "Services", href: "/services" },
+  { name: "Gallery", href: "/gallery" },
   { name: "Contact", href: "/contact" },
 ];
 
@@ -31,7 +32,7 @@ export default function Navbar() {
 
   useEffect(() => {
     setMounted(true);
-    
+
     // Only show splash screen on the Home page, and only once per session
     if (window.location.pathname === "/") {
       const hasSeenSplash = sessionStorage.getItem("hasSeenSplash");
@@ -57,8 +58,8 @@ export default function Navbar() {
     session?.user?.role === "ADMIN"
       ? "/admin"
       : session?.user?.role === "DEALER"
-      ? "/dealer"
-      : "/customer";
+        ? "/dealer"
+        : "/customer";
 
   return (
     <>
@@ -85,7 +86,9 @@ export default function Navbar() {
       <header
         className={cn(
           "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-          scrolled ? "bg-black/80 backdrop-blur-lg border-b border-white/10 py-3" : "bg-transparent py-5"
+          scrolled
+            ? "bg-black border-b border-white/10 py-3"
+            : "bg-black/90 py-5"
         )}
       >
         <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
@@ -100,137 +103,137 @@ export default function Navbar() {
             </motion.div>
           </Link>
 
-        {/* Desktop Nav */}
-        <nav className="hidden lg:flex items-center gap-7">
-          {PUBLIC_NAV.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={cn(
-                "text-sm font-medium transition-colors hover:text-primary relative group",
-                pathname === link.href ? "text-primary" : "text-white/70"
-              )}
-            >
-              {link.name}
-              <span
+          {/* Desktop Nav */}
+          <nav className="hidden lg:flex items-center gap-7">
+            {PUBLIC_NAV.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
                 className={cn(
-                  "absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full",
-                  pathname === link.href ? "w-full" : ""
+                  "text-sm font-medium transition-colors hover:text-primary relative group",
+                  pathname === link.href ? "text-primary" : "text-white/70"
                 )}
-              />
-            </Link>
-          ))}
-        </nav>
-
-        {/* Desktop Actions */}
-        <div className="hidden lg:flex items-center gap-3">
-          {/* Cart */}
-          <Link
-            href="/cart"
-            className="relative w-9 h-9 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
-            aria-label="Shopping Cart"
-          >
-            <ShoppingCart className="w-4 h-4" />
-            {totalItems > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-primary text-black text-[10px] font-bold rounded-full flex items-center justify-center">
-                {totalItems > 9 ? "9+" : totalItems}
-              </span>
-            )}
-          </Link>
-
-          {session?.user ? (
-            <div className="flex items-center gap-2">
-              <Link
-                href={dashboardHref}
-                className="flex items-center gap-2 bg-white/5 border border-white/10 text-white text-sm font-medium px-3 py-2 rounded-xl hover:bg-white/10 transition-colors"
               >
-                <LayoutDashboard className="w-4 h-4" />
-                Dashboard
+                {link.name}
+                <span
+                  className={cn(
+                    "absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full",
+                    pathname === link.href ? "w-full" : ""
+                  )}
+                />
               </Link>
-              <button
-                onClick={() => signOut({ callbackUrl: "/" })}
-                className="text-gray-400 hover:text-red-400 transition-colors p-2 rounded-xl hover:bg-red-400/10"
-                aria-label="Sign Out"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
-            </div>
-          ) : (
-            <>
-              <Link
-                href="/auth/login"
-                className="text-sm font-medium text-white/70 hover:text-white transition-colors px-3 py-2"
-              >
-                Sign In
-              </Link>
-              <Link
-                href="/auth/dealer-register"
-                className="bg-primary text-black font-heading font-bold text-sm px-4 py-2.5 rounded-xl hover:bg-primary/90 transition-colors"
-              >
-                Become a Dealer
-              </Link>
-            </>
-          )}
-        </div>
+            ))}
+          </nav>
 
-        {/* Mobile toggle */}
-        <div className="lg:hidden flex items-center gap-3">
-          <Link href="/cart" className="relative text-gray-300">
-            <ShoppingCart className="w-5 h-5" />
-            {totalItems > 0 && (
-              <span className="absolute -top-2 -right-2 w-4 h-4 bg-primary text-black text-[9px] font-bold rounded-full flex items-center justify-center">
-                {totalItems}
-              </span>
-            )}
-          </Link>
-          <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="text-white p-1"
-            aria-label="Toggle menu"
-          >
-            {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile menu */}
-      {mobileOpen && (
-        <div className="lg:hidden bg-black/95 backdrop-blur-lg border-t border-white/10 px-4 py-6 space-y-4">
-          {PUBLIC_NAV.map((link) => (
+          {/* Desktop Actions */}
+          <div className="hidden lg:flex items-center gap-3">
+            {/* Cart */}
             <Link
-              key={link.href}
-              href={link.href}
-              className={cn(
-                "flex items-center justify-between text-lg font-heading font-bold py-2 transition-colors",
-                pathname === link.href ? "text-primary" : "text-white/80 hover:text-primary"
-              )}
+              href="/cart"
+              className="relative w-9 h-9 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+              aria-label="Shopping Cart"
             >
-              {link.name}
-              <ChevronRight className="w-4 h-4" />
+              <ShoppingCart className="w-4 h-4" />
+              {totalItems > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-primary text-black text-[10px] font-bold rounded-full flex items-center justify-center">
+                  {totalItems > 9 ? "9+" : totalItems}
+                </span>
+              )}
             </Link>
-          ))}
-          <div className="pt-4 border-t border-white/10 space-y-3">
+
             {session?.user ? (
-              <>
-                <Link href={dashboardHref} className="flex items-center gap-2 text-white font-medium py-2">
-                  <LayoutDashboard className="w-4 h-4 text-primary" /> Dashboard
+              <div className="flex items-center gap-2">
+                <Link
+                  href={dashboardHref}
+                  className="flex items-center gap-2 bg-white/5 border border-white/10 text-white text-sm font-medium px-3 py-2 rounded-xl hover:bg-white/10 transition-colors"
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  Dashboard
                 </Link>
-                <button onClick={() => signOut({ callbackUrl: "/" })} className="flex items-center gap-2 text-red-400 font-medium py-2">
-                  <LogOut className="w-4 h-4" /> Sign Out
+                <button
+                  onClick={() => signOut({ callbackUrl: "/" })}
+                  className="text-gray-400 hover:text-red-400 transition-colors p-2 rounded-xl hover:bg-red-400/10"
+                  aria-label="Sign Out"
+                >
+                  <LogOut className="w-4 h-4" />
                 </button>
-              </>
+              </div>
             ) : (
               <>
-                <Link href="/auth/login" className="block text-white font-medium py-2">Sign In</Link>
-                <Link href="/auth/dealer-register" className="block w-full bg-primary text-black font-bold py-3 rounded-xl text-center hover:bg-primary/90 transition-colors">
+                <Link
+                  href="/auth/login"
+                  className="text-sm font-medium text-white/70 hover:text-white transition-colors px-3 py-2"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/auth/dealer-register"
+                  className="bg-primary text-black font-heading font-bold text-sm px-4 py-2.5 rounded-xl hover:bg-primary/90 transition-colors"
+                >
                   Become a Dealer
                 </Link>
               </>
             )}
           </div>
+
+          {/* Mobile toggle */}
+          <div className="lg:hidden flex items-center gap-3">
+            <Link href="/cart" className="relative text-gray-300">
+              <ShoppingCart className="w-5 h-5" />
+              {totalItems > 0 && (
+                <span className="absolute -top-2 -right-2 w-4 h-4 bg-primary text-black text-[9px] font-bold rounded-full flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
+            </Link>
+            <button
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="text-white p-1"
+              aria-label="Toggle menu"
+            >
+              {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
-      )}
-    </header>
+
+        {/* Mobile menu */}
+        {mobileOpen && (
+          <div className="lg:hidden bg-black/95 backdrop-blur-lg border-t border-white/10 px-4 py-6 space-y-4">
+            {PUBLIC_NAV.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  "flex items-center justify-between text-lg font-heading font-bold py-2 transition-colors",
+                  pathname === link.href ? "text-primary" : "text-white/80 hover:text-primary"
+                )}
+              >
+                {link.name}
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            ))}
+            <div className="pt-4 border-t border-white/10 space-y-3">
+              {session?.user ? (
+                <>
+                  <Link href={dashboardHref} className="flex items-center gap-2 text-white font-medium py-2">
+                    <LayoutDashboard className="w-4 h-4 text-primary" /> Dashboard
+                  </Link>
+                  <button onClick={() => signOut({ callbackUrl: "/" })} className="flex items-center gap-2 text-red-400 font-medium py-2">
+                    <LogOut className="w-4 h-4" /> Sign Out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link href="/auth/login" className="block text-white font-medium py-2">Sign In</Link>
+                  <Link href="/auth/dealer-register" className="block w-full bg-primary text-black font-bold py-3 rounded-xl text-center hover:bg-primary/90 transition-colors">
+                    Become a Dealer
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+      </header>
     </>
   );
 }

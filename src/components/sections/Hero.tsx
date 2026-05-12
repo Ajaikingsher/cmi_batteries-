@@ -5,8 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 
 const HERO_SLIDES = [
-  { src: "/assets/slides/dealers.jpg", name: "Dealers" },
-  { src: "/assets/slides/products.jpg", name: "Products" },
+  { src: "/assets/slides/dealers (4).png", name: "Dealers" },
+  { src: "/assets/slides/products (3).jpeg", name: "Products" },
   { src: "/assets/slides/services.jpg", name: "Services" }
 ];
 
@@ -79,9 +79,8 @@ export default function Hero() {
           <button
             key={i}
             onClick={() => setCurrentImageIndex(i)}
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${
-              i === currentImageIndex ? "bg-primary w-6" : "bg-white/40"
-            }`}
+            className={`w-2 h-2 rounded-full transition-all duration-300 ${i === currentImageIndex ? "bg-primary w-6" : "bg-white/40"
+              }`}
             aria-label={`Go to slide ${i + 1}`}
           />
         ))}

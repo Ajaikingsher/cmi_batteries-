@@ -8,9 +8,11 @@ import { formatCurrency } from "@/lib/utils/api";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
+import DevelopmentModal from "@/components/shared/DevelopmentModal";
 
 export default function CartPage() {
   const { items, removeItem, updateQty, subtotal, taxTotal, shippingAmount, grandTotal, totalItems } = useCart();
+  const [showModal, setShowModal] = useState(false);
 
   if (items.length === 0) {
     return (
@@ -61,7 +63,7 @@ export default function CartPage() {
                     {/* Image */}
                     <div className="w-20 h-20 bg-white/5 rounded-xl overflow-hidden shrink-0 relative">
                       {item.image ? (
-                        <Image src={item.image} alt={item.name} fill className="object-contain p-2" />
+                        <Image src={item.image} alt={item.name} fill sizes="80px" className="object-contain p-2" />
                       ) : (
                         <div className="flex items-center justify-center h-full">
                           <Package className="w-8 h-8 text-gray-700" />
@@ -143,12 +145,14 @@ export default function CartPage() {
                   </div>
                 </div>
 
-                <Link
-                  href="/checkout"
+                <button
+                  onClick={() => setShowModal(true)}
                   className="flex items-center justify-center gap-2 w-full bg-primary text-black font-heading font-bold py-3.5 rounded-xl hover:bg-primary/90 transition-colors mt-6"
                 >
                   Proceed to Checkout <ArrowRight className="w-4 h-4" />
-                </Link>
+                </button>
+
+                <DevelopmentModal isOpen={showModal} onClose={() => setShowModal(false)} />
 
                 <Link
                   href="/products"

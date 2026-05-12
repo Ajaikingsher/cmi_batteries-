@@ -2,6 +2,7 @@ export const NAV_LINKS = [
   { name: "Home", href: "/" },
   { name: "About", href: "/about" },
   { name: "Products", href: "/products" },
+  { name: "Gallery", href: "/gallery" },
   { name: "Services", href: "/services" },
   { name: "Dealer Network", href: "/dealer" },
   { name: "Warranty", href: "/warranty" },

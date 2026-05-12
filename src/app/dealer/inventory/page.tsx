@@ -60,7 +60,7 @@ export default async function DealerInventoryPage() {
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center relative">
                             {p.images[0]?.url ? (
-                              <Image src={p.images[0].url} alt={p.name} fill className="object-contain p-1" />
+                              <Image src={p.images[0].url} alt={p.name} fill sizes="40px" className="object-contain p-1" />
                             ) : (
                               <Package className="w-4 h-4 text-gray-600" />
                             )}

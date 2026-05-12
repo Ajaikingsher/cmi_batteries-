@@ -5,6 +5,9 @@ import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
+import FactoryShowcase from "@/components/sections/FactoryShowcase";
+import FutureGoals from "@/components/sections/FutureGoals";
+import TeamShowcase from "@/components/sections/TeamShowcase";
 
 export const metadata: Metadata = {
   title: "About Us | Chinna Mayil Industries — Perfect Batteries",
@@ -68,8 +71,11 @@ export default function AboutPage() {
           </div>
         </section>
 
+        {/* Factory Showcase */}
+        <FactoryShowcase />
+
         {/* Story */}
-        <section className="max-w-6xl mx-auto px-4 py-12">
+        <section className="max-w-6xl mx-auto px-4 py-24 border-t border-white/5">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
               <h2 className="text-3xl font-heading font-bold text-white mb-6">Our Story</h2>
@@ -118,8 +124,14 @@ export default function AboutPage() {
           </div>
         </section>
 
+        {/* Future Goals */}
+        <FutureGoals />
+
+        {/* Team Showcase */}
+        <TeamShowcase />
+
         {/* Values */}
-        <section className="max-w-6xl mx-auto px-4 py-12">
+        <section className="max-w-6xl mx-auto px-4 py-24 border-t border-white/5">
           <h2 className="text-3xl font-heading font-bold text-white text-center mb-10">Our Values</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {values.map(({ title, desc }) => (
@@ -183,3 +195,4 @@ export default function AboutPage() {
     </>
   );
 }
+

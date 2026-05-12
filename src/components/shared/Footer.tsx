@@ -69,14 +69,29 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="font-heading font-bold mb-6 text-white uppercase tracking-wider text-sm">Newsletter</h4>
-            <p className="text-gray-400 text-sm mb-4">Subscribe for latest battery tech updates.</p>
-            <div className="flex gap-2">
-              <Input placeholder="Your Email" className="bg-white/5 border-white/10 focus-visible:ring-primary" />
-              <Button size="icon" className="bg-primary text-black hover:bg-primary/90 shrink-0">
-                <Zap className="w-4 h-4 fill-black" />
-              </Button>
-            </div>
+            <h4 className="font-heading font-bold mb-6 text-white uppercase tracking-wider text-sm">Location</h4>
+            <a 
+              href="https://www.google.com/maps/place/CHINNA+MAYIL+INDUSTRIES/@10.9125928,76.96592,982m/data=!3m2!1e3!4b1!4m6!3m5!1s0x3ba85b0e3fd33829:0xdfbb2ff8904c8b3f!8m2!3d10.9125928!4d76.9684949!16s%2Fg%2F11z6pt1lsq!18m1!1e1?entry=ttu&g_ep=EgoyMDI2MDUwNi4wIKXMDSoASAFQAw%3D%3D" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="block group relative overflow-hidden rounded-2xl bg-white/5 border border-white/10 p-4 hover:border-primary/50 transition-all cursor-pointer"
+            >
+              <div className="flex items-start gap-3 mb-4">
+                <MapPin className="w-5 h-5 text-primary shrink-0 mt-1" />
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  Visit us at our headquarters in Coimbatore for technical support and inquiries.
+                </p>
+              </div>
+              <div className="inline-flex items-center gap-2 text-xs font-bold text-primary group-hover:text-white transition-colors uppercase tracking-widest relative">
+                <span className="relative">
+                  Get Directions
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300" />
+                </span>
+                <Zap className="w-3 h-3 transition-transform group-hover:translate-x-1" />
+              </div>
+              {/* Decorative element - now with pointer-events-none */}
+              <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-all pointer-events-none" />
+            </a>
           </div>
         </div>
 
