@@ -135,7 +135,7 @@ export default function TeamShowcase() {
         {/* Founders & Directors */}
         <div>
           <div className="flex items-center gap-4 mb-10">
-            <h3 className="text-xl font-heading font-bold text-white uppercase tracking-widest">Founders & Directors</h3>
+            <h3 className="text-xl font-heading font-bold text-white uppercase tracking-widest">Management Team</h3>
             <div className="h-px flex-1 bg-gradient-to-r from-primary/50 to-transparent" />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
