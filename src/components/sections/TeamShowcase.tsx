@@ -8,7 +8,7 @@ import Image from "next/image";
 const TEAM = {
   founders: [
     {
-      name: "Shri. THANGARAJ CHINDRAS",
+      name: "Shri. THANGARAJ CHINNARAJ",
       role: "Founder & Chairman",
       image: "/assets/Members/Shri. C. THANGARAJ.jpeg",
       bio: "Visionary leader driving innovation, growth, and excellence with a future-focused approach.",
@@ -72,7 +72,7 @@ const TeamMemberCard = ({ member, isLarge = false, isFuturistic = false }: { mem
         </div>
 
         {/* Info */}
-        <h3 className={`font-heading font-bold text-white mb-1 transition-colors group-hover:text-primary ${isLarge ? "text-2xl" : "text-lg"}`}>
+        <h3 className={`font-heading font-bold text-white mb-1 transition-colors group-hover:text-primary whitespace-nowrap tracking-tight ${isLarge ? "text-[clamp(0.875rem,2vw,1.25rem)]" : "text-[clamp(0.75rem,1.5vw,1rem)]"}`}>
           {member.name}
         </h3>
         <p className={`text-primary font-bold tracking-widest uppercase mb-4 ${isLarge ? "text-xs" : "text-[10px]"}`}>
