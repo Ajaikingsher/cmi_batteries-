@@ -27,7 +27,6 @@ const stats = [
   { label: "Years of Experience", value: "42+", icon: Award },
   { label: "Products Manufactured", value: "50K+", icon: Factory },
   { label: "Active Dealers", value: "200+", icon: Users },
-  { label: "States Covered", value: "15+", icon: MapPin },
 ];
 
 const values = [
@@ -60,7 +59,7 @@ export default function AboutPage() {
 
         {/* Stats */}
         <section className="max-w-6xl mx-auto px-4 py-16">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             {stats.map(({ label, value, icon: Icon }) => (
               <div key={label} className="bg-white/5 border border-white/10 rounded-2xl p-6 text-center hover:border-primary/30 transition-colors">
                 <Icon className="w-6 h-6 text-primary mx-auto mb-3" />
@@ -93,8 +92,7 @@ export default function AboutPage() {
                 </p>
                 <p>
                   Today, with a state-of-the-art manufacturing facility in Madukkarai, Coimbatore,
-                  we serve customers and dealers across 15+ states, backed by a robust pan-India
-                  service network.
+                  we serve customers and dealers with a robust pan-India service network.
                 </p>
               </div>
               <div className="mt-6 flex items-center gap-2 text-sm text-gray-400">

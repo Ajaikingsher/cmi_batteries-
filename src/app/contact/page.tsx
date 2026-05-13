@@ -31,15 +31,7 @@ export default function ContactPage() {
             <div>
               <h2 className="text-2xl font-heading font-bold text-white mb-6">Contact Information</h2>
               <div className="space-y-4">
-                <div className="flex items-start gap-4 bg-white/5 border border-white/10 rounded-2xl p-4">
-                  <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
-                    <MapPin className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">Address</p>
-                    <p className="text-white text-sm leading-relaxed">{COMPANY_INFO.address}</p>
-                  </div>
-                </div>
+
 
                 <div className="flex items-center gap-4 bg-white/5 border border-white/10 rounded-2xl p-4">
                   <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">

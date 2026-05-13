@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { Zap, Globe, MessageSquare, Mail, Phone, MapPin } from "lucide-react";
+import { Zap, Globe, MessageSquare, Mail, Phone, MapPin, Clock } from "lucide-react";
 import { COMPANY_INFO, NAV_LINKS } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,8 +54,8 @@ export default function Footer() {
             <h4 className="font-heading font-bold mb-6 text-white uppercase tracking-wider text-sm">Contact Us</h4>
             <ul className="space-y-4">
               <li className="flex gap-3 text-sm text-gray-400">
-                <MapPin className="w-5 h-5 text-primary shrink-0" />
-                <span>{COMPANY_INFO.address}</span>
+                <Clock className="w-5 h-5 text-primary shrink-0" />
+                <span>Mon - Sat: 9:00 AM - 6:00 PM</span>
               </li>
               <li className="flex gap-3 text-sm text-gray-400">
                 <Phone className="w-5 h-5 text-primary shrink-0" />

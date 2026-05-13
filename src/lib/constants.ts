@@ -16,7 +16,7 @@ export const COMPANY_INFO = {
   brand: "Perfect Batteries",
   tagline: "Power Your Ride",
   address: "No. J31/1, ISP Godown, Mohan Block, Kurumbapalayam Pirivu, Sundrapuram Road, Madukkarai Post, Coimbatore – 641105",
-  phone: "90474 000 21",
+  phone: "0 422 422 7227",
   email: "sales@cmibattery.com",
   website: "www.cmibattery.com",
   instagram: "perfect_batteries",
