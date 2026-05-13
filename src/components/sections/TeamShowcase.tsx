@@ -8,7 +8,7 @@ import Image from "next/image";
 const TEAM = {
   founders: [
     {
-      name: "Shri. C. THANGARAJ",
+      name: "Shri. THANGARAJ CHINDRAS",
       role: "Founder & Chairman",
       image: "/assets/Members/Shri. C. THANGARAJ.jpeg",
       bio: "Visionary leader driving innovation, growth, and excellence with a future-focused approach.",
@@ -20,7 +20,7 @@ const TEAM = {
       bio: "Driving innovation, leadership, and strategic growth with a vision for excellence.",
     },
     {
-      name: "Mr. Mohan",
+      name: "Mr. G. MOHANRAJ",
       role: "Factory Manager",
       image: "/assets/Members/mr.mohan.jpeg",
       bio: "42+ years of trusted excellence in delivering high-performance lithium battery solutions.",
