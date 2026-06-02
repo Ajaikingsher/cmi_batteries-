@@ -35,9 +35,9 @@ npm run db:seed
 
 This creates:
 - ✅ 4 product categories
-- ✅ Admin user: `admin@cmibattery.com` / `Admin@CMI2024`
-- ✅ Dealer user: `dealer@abcbatteries.com` / `Dealer@123`
-- ✅ Customer user: `customer@example.com` / `Customer@123`
+- ✅ Admin user: 
+- ✅ Dealer user:
+- ✅ Customer user: 
 - ✅ 5 demo products with specs & inventory
 
 ### 5. Start the dev server
