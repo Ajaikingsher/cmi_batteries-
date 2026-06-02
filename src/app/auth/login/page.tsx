@@ -10,10 +10,12 @@ import { motion } from "framer-motion";
 import { Eye, EyeOff, Zap, Loader2, AlertCircle } from "lucide-react";
 import { loginSchema, type LoginInput } from "@/lib/validations/auth";
 import { COMPANY_INFO } from "@/lib/constants";
+import { checkIsAdmin } from "@/actions/auth";
 
 export default function LoginPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const [showPinField, setShowPinField] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
   const {
@@ -26,20 +28,39 @@ export default function LoginPage() {
 
   async function onSubmit(data: LoginInput) {
     setServerError(null);
-    const result = await signIn("credentials", {
-      email: data.email,
-      password: data.password,
-      redirect: false,
-    });
 
-    if (result?.error) {
-      setServerError("Invalid email or password. Please try again.");
-      return;
+    try {
+      // Check if this is an administrator account
+      const isAdmin = await checkIsAdmin(data.email);
+
+      if (isAdmin && !showPinField) {
+        setShowPinField(true);
+        return; // Prompt user for PIN, do not sign in yet
+      }
+
+      const result = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        pin: data.pin || "",
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setServerError(
+          isAdmin 
+            ? "Invalid email, password, or PIN. Please try again." 
+            : "Invalid email or password. Please try again."
+        );
+        return;
+      }
+
+      // Redirect based on role — middleware + session will handle final routing
+      router.push("/");
+      router.refresh();
+    } catch (err) {
+      console.error(err);
+      setServerError("An error occurred during login. Please try again.");
     }
-
-    // Redirect based on role — middleware + session will handle final routing
-    router.push("/");
-    router.refresh();
   }
 
   return (
@@ -119,13 +140,51 @@ export default function LoginPage() {
               )}
             </div>
 
+            {showPinField && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-2 border-t border-white/5 pt-4"
+              >
+                <div className="flex items-center justify-between">
+                  <label className="block text-sm font-medium text-[#FFD700]">
+                    Admin Security PIN
+                  </label>
+                  <span className="text-[10px] bg-[#FFD700]/10 text-[#FFD700] px-2 py-0.5 rounded-full border border-[#FFD700]/20 font-mono">
+                    MFA Required
+                  </span>
+                </div>
+                <div className="relative">
+                  <input
+                    {...register("pin")}
+                    type="password"
+                    maxLength={6}
+                    placeholder="••••••"
+                    className="w-full bg-white/5 border border-[#FFD700]/30 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-[#FFD700] focus:ring-1 focus:ring-[#FFD700] transition-colors tracking-[0.5em] text-center font-bold font-mono"
+                  />
+                </div>
+                <p className="text-gray-400 text-[11px] leading-normal">
+                  Administrator account detected. Please enter your 6-digit security PIN to proceed.
+                </p>
+                {errors.pin && (
+                  <p className="text-red-400 text-xs mt-1">{errors.pin.message}</p>
+                )}
+              </motion.div>
+            )}
+
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-primary text-black font-heading font-bold py-3 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className={`w-full font-heading font-bold py-3 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${
+                showPinField
+                  ? "bg-[#FFD700] text-black hover:bg-[#FFD700]/90 shadow-[0_0_15px_rgba(255,215,0,0.15)] hover:shadow-[0_0_20px_rgba(255,215,0,0.25)]"
+                  : "bg-primary text-black hover:bg-primary/90"
+              }`}
             >
               {isSubmitting ? (
                 <><Loader2 className="w-4 h-4 animate-spin" /> Signing in…</>
+              ) : showPinField ? (
+                "Verify & Sign In"
               ) : (
                 "Sign In"
               )}

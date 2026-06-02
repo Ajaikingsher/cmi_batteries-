@@ -96,3 +96,21 @@ export async function loginUser(formData: {
 export async function logoutUser() {
   await signOut({ redirectTo: "/" });
 }
+
+// ============================================================
+// CHECK ADMIN STATUS
+// ============================================================
+
+export async function checkIsAdmin(email: string): Promise<boolean> {
+  try {
+    if (!email) return false;
+    const user = await db.user.findUnique({
+      where: { email: email.toLowerCase() },
+      select: { role: true },
+    });
+    return user?.role === "ADMIN";
+  } catch (error) {
+    console.error("[checkIsAdmin]", error);
+    return false;
+  }
+}
