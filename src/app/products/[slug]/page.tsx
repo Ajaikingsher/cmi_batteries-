@@ -205,7 +205,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
               </div>
               <div className="bg-white/5 border border-white/10 rounded-xl p-3 text-center">
                 <CheckCircle className="w-5 h-5 text-primary mx-auto mb-1" />
-                <div className="text-white text-sm font-medium">ISI Certified</div>
+                <div className="text-white text-sm font-medium">Made in India</div>
               </div>
             </div>
           </div>

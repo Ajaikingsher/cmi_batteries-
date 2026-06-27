@@ -458,3 +458,40 @@ model Notification {
   @@index([read])
   @@map("notifications")
 }
+
+// ============================================================
+// GALLERY
+// ============================================================
+
+model GalleryEvent {
+  id          String         @id @default(cuid())
+  name        String
+  category    String
+  eventDate   DateTime
+  location    String?
+  description String?        @db.Text
+  isFeatured  Boolean        @default(false)
+  isPublished Boolean        @default(true)
+  sortOrder   Int            @default(0)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  images      GalleryImage[]
+
+  @@map("gallery_events")
+}
+
+model GalleryImage {
+  id         String       @id @default(cuid())
+  eventId    String
+  url        String
+  publicId   String
+  isCover    Boolean      @default(false)
+  sortOrder  Int          @default(0)
+
+  event      GalleryEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@map("gallery_images")
+}
+

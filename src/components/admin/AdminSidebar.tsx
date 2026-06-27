@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import {
   LayoutDashboard, Package, Tag, ShoppingCart,
   Users, FileText, CreditCard, BarChart3,
-  Warehouse, Bell, Settings, Zap, ChevronRight,
+  Warehouse, Bell, Settings, Zap, ChevronRight, Image as ImageIcon,
 } from "lucide-react";
 
 const NAV = [
@@ -20,6 +20,7 @@ const NAV = [
   { label: "Quotations", href: "/admin/quotations", icon: FileText },
   { label: "Payments", href: "/admin/payments", icon: CreditCard },
   { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
+  { label: "Gallery", href: "/admin/gallery", icon: ImageIcon },
   { label: "Notifications", href: "/admin/notifications", icon: Bell },
   { label: "Settings", href: "/admin/settings", icon: Settings },
 ];

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Search, Star } from "lucide-react";
+import { Search } from "lucide-react";
 
 const SPECS_DATA = [
   {
@@ -12,7 +12,6 @@ const SPECS_DATA = [
     breadth: 10,
     height: 10,
     weight: 1.420,
-    isFlagship: true,
   },
   {
     model: "CMIP 12 - 09",
@@ -22,7 +21,6 @@ const SPECS_DATA = [
     breadth: 7,
     height: 10.5,
     weight: 0.726,
-    isFlagship: false,
   },
   {
     model: "CMIP 12 - 07",
@@ -32,7 +30,6 @@ const SPECS_DATA = [
     breadth: 7,
     height: 9,
     weight: 0.726,
-    isFlagship: false,
   },
   {
     model: "CMIP 12 - 05",
@@ -42,7 +39,6 @@ const SPECS_DATA = [
     breadth: 7,
     height: 9,
     weight: 0.666,
-    isFlagship: false,
   },
 ];
 
@@ -103,27 +99,13 @@ export default function SpecificationTable() {
                     filteredSpecs.map((spec) => (
                       <tr
                         key={spec.model}
-                        className={`transition-colors hover:bg-white/[0.02] ${
-                          spec.isFlagship
-                            ? "bg-primary/5 border-l-2 border-l-primary relative"
-                            : ""
-                        }`}
+                        className="transition-colors hover:bg-white/[0.02]"
                       >
                         <td className="px-6 py-5 whitespace-nowrap">
                           <div className="flex items-center gap-2">
-                            <span
-                              className={`font-heading font-bold ${
-                                spec.isFlagship ? "text-primary" : "text-white"
-                              }`}
-                            >
+                            <span className="font-heading font-bold text-white">
                               {spec.model}
                             </span>
-                            {spec.isFlagship && (
-                              <span className="inline-flex items-center gap-1 bg-primary/20 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full">
-                                <Star className="w-3 h-3 fill-primary" />
-                                FLAGSHIP
-                              </span>
-                            )}
                           </div>
                         </td>
                         <td className="px-6 py-5 whitespace-nowrap text-gray-300">
