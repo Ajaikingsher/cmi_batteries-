@@ -10,8 +10,8 @@ interface GalleryMedia {
   id: string;
   mediaType: "IMAGE" | "VIDEO";
   url: string;
-  publicId?: string;
-  thumbnailUrl?: string;
+  publicId?: string | null;
+  thumbnailUrl?: string | null;
   isCover: boolean;
   sortOrder: number;
 }
