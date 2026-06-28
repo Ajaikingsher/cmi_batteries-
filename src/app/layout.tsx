@@ -57,11 +57,6 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true },
   },
-  icons: {
-    icon: "/assets/LOGO/logo2.png",
-    shortcut: "/assets/LOGO/logo2.png",
-    apple: "/assets/LOGO/logo2.png",
-  },
 };
 
 export default async function RootLayout({
