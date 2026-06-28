@@ -42,7 +42,7 @@ export default function CartPage() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-[#0A0A0A] pt-32 pb-20 px-4">
+      <main className="min-h-screen bg-[#0A0A0A] pt-40 md:pt-48 pb-20 px-4">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-3xl font-heading font-bold text-white mb-2">
             Shopping Cart
