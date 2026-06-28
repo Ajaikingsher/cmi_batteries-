@@ -11,10 +11,10 @@ export const metadata: Metadata = {
 
 export default async function GalleryPage() {
   const events = await db.galleryEvent.findMany({
-    where: { isPublished: true },
+    where: { isPublished: true, isFeatured: true },
     orderBy: { sortOrder: "asc" },
     include: {
-      images: {
+      media: {
         orderBy: { sortOrder: "asc" },
       },
     },

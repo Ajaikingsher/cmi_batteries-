@@ -13,12 +13,12 @@ export default async function AdminGalleryPage() {
   const events = await db.galleryEvent.findMany({
     orderBy: { sortOrder: "asc" },
     include: {
-      images: {
+      media: {
         where: { isCover: true },
         take: 1,
       },
       _count: {
-        select: { images: true }
+        select: { media: true }
       }
     },
   });
@@ -62,8 +62,14 @@ export default async function AdminGalleryPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-lg overflow-hidden bg-white/10 relative shrink-0">
-                        {event.images[0] ? (
-                          <Image src={event.images[0].url} alt="" fill className="object-cover" />
+                        {event.media[0] ? (
+                          event.media[0].thumbnailUrl || event.media[0].url ? (
+                            <Image src={event.media[0].thumbnailUrl || event.media[0].url} alt="" fill className="object-cover" />
+                          ) : (
+                            <div className="flex items-center justify-center h-full text-gray-500">
+                              <ImageIcon className="w-4 h-4" />
+                            </div>
+                          )
                         ) : (
                           <div className="flex items-center justify-center h-full text-gray-500">
                             <ImageIcon className="w-4 h-4" />
@@ -93,7 +99,7 @@ export default async function AdminGalleryPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-gray-400 text-sm">
-                    {event._count.images}
+                    {event._count.media}
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">

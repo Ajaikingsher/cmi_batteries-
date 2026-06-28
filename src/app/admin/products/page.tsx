@@ -1,8 +1,8 @@
 import { db } from "@/lib/db";
 import Link from "next/link";
 import { formatCurrency, formatDate } from "@/lib/utils/api";
-import { Plus, Search, Package, Edit, Eye } from "lucide-react";
-import DeleteProductButton from "@/components/admin/DeleteProductButton";
+import { Plus, Search } from "lucide-react";
+import ProductListClient from "./ProductListClient";
 
 interface PageProps {
   searchParams: Promise<{ page?: string; search?: string }>;
@@ -30,7 +30,10 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
         inventory: { select: { quantity: true, lowStockThreshold: true } },
         images: { where: { isPrimary: true }, take: 1 },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: [
+        { sortOrder: "asc" },
+        { createdAt: "desc" }
+      ],
       skip: (page - 1) * limit,
       take: limit,
     }),
@@ -67,77 +70,8 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
       </form>
 
       {/* Table */}
-      <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-gray-400 text-xs uppercase tracking-widest border-b border-white/10">
-                <th className="text-left p-4">Product</th>
-                <th className="text-left p-4">SKU</th>
-                <th className="text-left p-4">Category</th>
-                <th className="text-left p-4">Price</th>
-                <th className="text-left p-4">Stock</th>
-                <th className="text-left p-4">Status</th>
-                <th className="text-right p-4">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.length === 0 && (
-                <tr>
-                  <td colSpan={7} className="text-center py-12 text-gray-500">
-                    <Package className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                    No products found
-                  </td>
-                </tr>
-              )}
-              {products.map((p) => {
-                const qty = p.inventory?.quantity ?? 0;
-                const low = qty <= (p.inventory?.lowStockThreshold ?? 10);
-                return (
-                  <tr key={p.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
-                    <td className="p-4">
-                      <p className="text-white font-medium line-clamp-1">{p.name}</p>
-                      {p.isFeatured && (
-                        <span className="text-xs text-primary bg-primary/10 px-1.5 py-0.5 rounded">Featured</span>
-                      )}
-                    </td>
-                    <td className="p-4 font-mono text-gray-400 text-xs">{p.sku}</td>
-                    <td className="p-4 text-gray-300">{p.category.name}</td>
-                    <td className="p-4 text-white">{formatCurrency(Number(p.price))}</td>
-                    <td className="p-4">
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                        qty === 0 ? "bg-red-400/10 text-red-400"
-                          : low ? "bg-orange-400/10 text-orange-400"
-                          : "bg-green-400/10 text-green-400"
-                      }`}>
-                        {qty} units
-                      </span>
-                    </td>
-                    <td className="p-4">
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                        p.isActive ? "bg-green-400/10 text-green-400" : "bg-gray-400/10 text-gray-400"
-                      }`}>
-                        {p.isActive ? "Active" : "Inactive"}
-                      </span>
-                    </td>
-                    <td className="p-4">
-                      <div className="flex items-center justify-end gap-2">
-                        <Link href={`/products/${p.slug}`} target="_blank" className="text-gray-500 hover:text-white transition-colors">
-                          <Eye className="w-4 h-4" />
-                        </Link>
-                        <Link href={`/admin/products/${p.id}/edit`} className="text-gray-500 hover:text-primary transition-colors">
-                          <Edit className="w-4 h-4" />
-                        </Link>
-                        <DeleteProductButton id={p.id} name={p.name} />
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      {/* Table Client Component */}
+      <ProductListClient initialProducts={products} search={search} />
 
       {/* Pagination */}
       {totalPages > 1 && (

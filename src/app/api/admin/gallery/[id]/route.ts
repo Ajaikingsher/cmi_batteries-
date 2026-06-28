@@ -16,6 +16,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         images: {
           orderBy: { sortOrder: "asc" },
         },
+        media: {
+          orderBy: { sortOrder: "asc" },
+        },
       },
     });
 
@@ -39,7 +42,6 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     
     // Check if it's a reorder request
     if (body.action === 'reorder' && Array.isArray(body.items)) {
-      // Transaction to update all sort orders
       await db.$transaction(
         body.items.map((item: { id: string; sortOrder: number }) =>
           db.galleryEvent.update({
@@ -51,12 +53,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       return apiSuccess({ success: true });
     }
 
-    const { name, category, eventDate, location, description, isFeatured, isPublished, images } = body;
+    const { name, category, eventDate, location, description, isFeatured, isPublished, media, images } = body;
+    const mediaToCreate = media || images;
 
-    // Standard update
-    // We'll delete existing images and recreate them to handle reordering/deletions easily
-    // In a production app with huge galleries, this might be optimized, but for now it's fine.
-    
     const event = await db.galleryEvent.update({
       where: { id },
       data: {
@@ -67,20 +66,21 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         description,
         isFeatured: isFeatured !== undefined ? !!isFeatured : undefined,
         isPublished: isPublished !== undefined ? !!isPublished : undefined,
-        images: images ? {
+        media: mediaToCreate ? {
           deleteMany: {},
-          create: images.map((img: any, i: number) => ({
+          create: mediaToCreate.map((img: any, i: number) => ({
+            mediaType: img.mediaType || "IMAGE",
             url: img.url,
             publicId: img.publicId,
+            thumbnailUrl: img.thumbnailUrl,
             isCover: !!img.isCover,
             sortOrder: i,
           })),
         } : undefined,
       },
       include: {
-        images: {
-          orderBy: { sortOrder: "asc" },
-        },
+        images: { orderBy: { sortOrder: "asc" } },
+        media: { orderBy: { sortOrder: "asc" } },
       },
     });
 

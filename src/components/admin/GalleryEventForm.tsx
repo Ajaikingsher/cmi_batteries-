@@ -3,14 +3,16 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Loader2, Plus, X, Upload, Star, GripVertical, CheckCircle2 } from "lucide-react";
+import { Loader2, Plus, X, Upload, Star, GripVertical, CheckCircle2, Video, Link as LinkIcon, Image as ImageIcon } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import type { DropResult } from "@hello-pangea/dnd";
 import { cn } from "@/lib/utils";
 
-interface GalleryImage {
+interface GalleryMedia {
+  mediaType: "IMAGE" | "VIDEO";
   url: string;
-  publicId: string;
+  publicId?: string;
+  thumbnailUrl?: string;
   isCover: boolean;
   sortOrder: number;
 }
@@ -19,13 +21,28 @@ interface GalleryEventFormProps {
   initialData?: any;
 }
 
+const PREDEFINED_CATEGORIES = [
+  "Events",
+  "Products",
+  "Behind the Scenes",
+  "Media",
+  "Other"
+];
+
 export default function GalleryEventForm({ initialData }: GalleryEventFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const initialCat = initialData?.category || "";
+  const [categoryType, setCategoryType] = useState(
+    PREDEFINED_CATEGORIES.includes(initialCat) || !initialCat ? initialCat : "Other"
+  );
+  const [customCategory, setCustomCategory] = useState(
+    PREDEFINED_CATEGORIES.includes(initialCat) ? "" : initialCat
+  );
+
   const [name, setName] = useState(initialData?.name || "");
-  const [category, setCategory] = useState(initialData?.category || "");
   const [eventDate, setEventDate] = useState(
     initialData?.eventDate ? new Date(initialData.eventDate).toISOString().split('T')[0] : ""
   );
@@ -34,19 +51,24 @@ export default function GalleryEventForm({ initialData }: GalleryEventFormProps)
   const [isFeatured, setIsFeatured] = useState(initialData?.isFeatured || false);
   const [isPublished, setIsPublished] = useState(initialData?.isPublished ?? true);
   
-  const [images, setImages] = useState<GalleryImage[]>(
-    initialData?.images?.map((img: any) => ({
-      url: img.url,
-      publicId: img.publicId,
-      isCover: img.isCover,
-      sortOrder: img.sortOrder,
+  const [media, setMedia] = useState<GalleryMedia[]>(
+    (initialData?.media?.length ? initialData.media : initialData?.images)?.map((m: any) => ({
+      mediaType: m.mediaType || "IMAGE",
+      url: m.url,
+      publicId: m.publicId,
+      thumbnailUrl: m.thumbnailUrl,
+      isCover: m.isCover,
+      sortOrder: m.sortOrder,
     })) || []
   );
 
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const [externalVideoUrl, setExternalVideoUrl] = useState("");
+  const [showExternalInput, setShowExternalInput] = useState(false);
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     
     setIsUploading(true);
@@ -54,7 +76,7 @@ export default function GalleryEventForm({ initialData }: GalleryEventFormProps)
     
     try {
       const files = Array.from(e.target.files);
-      const newImages: GalleryImage[] = [];
+      const newMedia: GalleryMedia[] = [];
       
       for (const file of files) {
         const formData = new FormData();
@@ -72,17 +94,21 @@ export default function GalleryEventForm({ initialData }: GalleryEventFormProps)
         }
         
         const data = await res.json();
-        newImages.push({
+        const isVideo = file.type.startsWith("video/");
+        
+        newMedia.push({
+          mediaType: isVideo ? "VIDEO" : "IMAGE",
           url: data.data.url,
           publicId: data.data.publicId,
-          isCover: images.length === 0 && newImages.length === 0, // Make first image cover by default
-          sortOrder: images.length + newImages.length,
+          thumbnailUrl: isVideo ? data.data.url.replace(/\.mp4$/, ".jpg") : undefined,
+          isCover: media.length === 0 && newMedia.length === 0 && !isVideo,
+          sortOrder: media.length + newMedia.length,
         });
       }
       
-      setImages((prev) => [...prev, ...newImages]);
+      setMedia((prev) => [...prev, ...newMedia]);
     } catch (err: any) {
-      setError(err.message || "Failed to upload images");
+      setError(err.message || "Failed to upload media");
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) {
@@ -91,25 +117,54 @@ export default function GalleryEventForm({ initialData }: GalleryEventFormProps)
     }
   };
 
-  const removeImage = (index: number) => {
-    setImages((prev) => {
-      const newImages = [...prev];
-      const removed = newImages.splice(index, 1)[0];
+  const handleAddExternalVideo = () => {
+    if (!externalVideoUrl) return;
+    
+    let embedUrl = externalVideoUrl;
+    let thumbnailUrl = "";
+    
+    // Simple youtube extraction
+    if (externalVideoUrl.includes("youtube.com") || externalVideoUrl.includes("youtu.be")) {
+      const match = externalVideoUrl.match(/(?:youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
+      if (match && match[1]) {
+        embedUrl = `https://www.youtube.com/embed/${match[1]}`;
+        thumbnailUrl = `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg`;
+      }
+    }
+    
+    setMedia(prev => [
+      ...prev,
+      {
+        mediaType: "VIDEO",
+        url: embedUrl,
+        thumbnailUrl,
+        isCover: false,
+        sortOrder: prev.length,
+      }
+    ]);
+    setExternalVideoUrl("");
+    setShowExternalInput(false);
+  };
+
+  const removeMediaItem = (index: number) => {
+    setMedia((prev) => {
+      const newMedia = [...prev];
+      const removed = newMedia.splice(index, 1)[0];
       
-      // If removed was cover, make the first available image the cover
-      if (removed.isCover && newImages.length > 0) {
-        newImages[0].isCover = true;
+      if (removed.isCover && newMedia.length > 0) {
+        const firstImage = newMedia.find(m => m.mediaType === "IMAGE");
+        if (firstImage) firstImage.isCover = true;
       }
       
-      // Reassign sortOrder
-      return newImages.map((img, i) => ({ ...img, sortOrder: i }));
+      return newMedia.map((m, i) => ({ ...m, sortOrder: i }));
     });
   };
 
   const setAsCover = (index: number) => {
-    setImages((prev) =>
-      prev.map((img, i) => ({
-        ...img,
+    if (media[index].mediaType !== "IMAGE") return; // Only images can be cover
+    setMedia((prev) =>
+      prev.map((m, i) => ({
+        ...m,
         isCover: i === index,
       }))
     );
@@ -118,13 +173,12 @@ export default function GalleryEventForm({ initialData }: GalleryEventFormProps)
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) return;
     
-    const items = Array.from(images);
+    const items = Array.from(media);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
     
-    // Reassign sortOrder
-    const newImages = items.map((img, i) => ({ ...img, sortOrder: i }));
-    setImages(newImages);
+    const newMedia = items.map((m, i) => ({ ...m, sortOrder: i }));
+    setMedia(newMedia);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -133,6 +187,9 @@ export default function GalleryEventForm({ initialData }: GalleryEventFormProps)
     setError(null);
     
     try {
+      const finalCategory = categoryType === "Other" ? customCategory : categoryType;
+      if (!finalCategory) throw new Error("Category is required");
+
       const url = initialData 
         ? `/api/admin/gallery/${initialData.id}`
         : `/api/admin/gallery`;
@@ -142,18 +199,17 @@ export default function GalleryEventForm({ initialData }: GalleryEventFormProps)
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name,
-          category,
+          category: finalCategory,
           eventDate,
           location,
           description,
           isFeatured,
           isPublished,
-          images,
+          media,
         }),
       });
       
       const data = await res.json();
-      
       if (!res.ok) throw new Error(data.error || "Failed to save");
       
       router.push("/admin/gallery");
@@ -186,17 +242,33 @@ export default function GalleryEventForm({ initialData }: GalleryEventFormProps)
               placeholder="e.g. Annual Dealer Meet"
             />
           </div>
+          
           <div className="space-y-2">
             <label className="text-sm text-gray-400">Category *</label>
-            <input
-              type="text"
-              required
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary focus:outline-none"
-              placeholder="e.g. Events, Product Showcase"
-            />
+            <div className="flex gap-2">
+              <select
+                value={categoryType}
+                onChange={(e) => setCategoryType(e.target.value)}
+                className="flex-1 bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary focus:outline-none"
+              >
+                <option value="">Select a category</option>
+                {PREDEFINED_CATEGORIES.map(c => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+            {categoryType === "Other" && (
+              <input
+                type="text"
+                required
+                value={customCategory}
+                onChange={(e) => setCustomCategory(e.target.value)}
+                className="w-full mt-2 bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary focus:outline-none"
+                placeholder="Enter custom category"
+              />
+            )}
           </div>
+          
           <div className="space-y-2">
             <label className="text-sm text-gray-400">Event Date *</label>
             <input
@@ -255,68 +327,111 @@ export default function GalleryEventForm({ initialData }: GalleryEventFormProps)
         </div>
       </div>
 
-      {/* Images Section */}
+      {/* Media Section */}
       <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h3 className="text-lg font-heading font-bold text-white">Event Images</h3>
-            <p className="text-gray-400 text-sm">Upload multiple images. Drag to reorder. First image is default cover.</p>
+            <h3 className="text-lg font-heading font-bold text-white">Event Media</h3>
+            <p className="text-gray-400 text-sm">Images (max 5MB) & Videos (max 20MB). First image is cover.</p>
           </div>
           
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isUploading}
-            className="flex items-center gap-2 bg-primary/10 text-primary hover:bg-primary/20 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-          >
-            {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-            Upload Images
-          </button>
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleImageUpload}
-            multiple
-            accept="image/jpeg, image/png, image/webp"
-            className="hidden"
-          />
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowExternalInput(!showExternalInput)}
+              className="flex items-center gap-2 bg-white/5 border border-white/10 text-white hover:bg-white/10 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            >
+              <LinkIcon className="w-4 h-4" />
+              External Video
+            </button>
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploading}
+              className="flex items-center gap-2 bg-primary/10 text-primary hover:bg-primary/20 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            >
+              {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+              Upload Media
+            </button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleMediaUpload}
+              multiple
+              accept="image/jpeg, image/png, image/webp, video/mp4, video/webm"
+              className="hidden"
+            />
+          </div>
         </div>
 
-        {images.length > 0 ? (
+        {showExternalInput && (
+          <div className="flex gap-2 items-center bg-[#111] p-3 rounded-xl border border-white/10">
+            <input 
+              type="url" 
+              placeholder="YouTube or Vimeo URL" 
+              value={externalVideoUrl}
+              onChange={(e) => setExternalVideoUrl(e.target.value)}
+              className="flex-1 bg-transparent text-white focus:outline-none px-2"
+            />
+            <button 
+              type="button" 
+              onClick={handleAddExternalVideo}
+              className="px-4 py-1.5 bg-primary text-black font-medium rounded-lg text-sm"
+            >
+              Add
+            </button>
+          </div>
+        )}
+
+        {media.length > 0 ? (
           <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId="gallery-images" direction="horizontal">
+            <Droppable droppableId="gallery-media" direction="horizontal">
               {(provided) => (
                 <div
                   {...provided.droppableProps}
                   ref={provided.innerRef}
                   className="grid grid-cols-2 md:grid-cols-4 gap-4"
                 >
-                  {images.map((img, index) => (
-                    <Draggable key={img.publicId} draggableId={img.publicId} index={index}>
+                  {media.map((m, index) => (
+                    <Draggable key={m.url} draggableId={m.url} index={index}>
                       {(provided, snapshot) => (
                         <div
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           className={cn(
                             "relative aspect-square rounded-xl overflow-hidden group bg-[#111] border",
-                            img.isCover ? "border-primary" : "border-white/10",
+                            m.isCover ? "border-primary" : "border-white/10",
                             snapshot.isDragging && "shadow-2xl shadow-primary/20 z-50 ring-2 ring-primary"
                           )}
                         >
-                          <Image src={img.url} alt="Gallery image" fill className="object-cover" />
+                          {m.mediaType === "IMAGE" || m.thumbnailUrl ? (
+                            <Image src={m.thumbnailUrl || m.url} alt="Gallery media" fill className="object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-white/5">
+                              <Video className="w-10 h-10 text-gray-500" />
+                            </div>
+                          )}
                           
-                          {img.isCover && (
-                            <div className="absolute top-2 left-2 bg-primary text-black text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-widest">
+                          {m.mediaType === "VIDEO" && (
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                              <div className="w-12 h-12 rounded-full bg-black/50 flex items-center justify-center border border-white/20 backdrop-blur-sm">
+                                <Video className="w-5 h-5 text-white ml-1" />
+                              </div>
+                            </div>
+                          )}
+
+                          {m.isCover && (
+                            <div className="absolute top-2 left-2 bg-primary text-black text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-widest z-10">
                               Cover
                             </div>
                           )}
 
-                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
+                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 z-20">
                             <div {...provided.dragHandleProps} className="p-2 cursor-grab text-white/70 hover:text-white">
                               <GripVertical className="w-5 h-5" />
                             </div>
                             
-                            {!img.isCover && (
+                            {!m.isCover && m.mediaType === "IMAGE" && (
                               <button
                                 type="button"
                                 onClick={() => setAsCover(index)}
@@ -328,7 +443,7 @@ export default function GalleryEventForm({ initialData }: GalleryEventFormProps)
                             
                             <button
                               type="button"
-                              onClick={() => removeImage(index)}
+                              onClick={() => removeMediaItem(index)}
                               className="absolute top-2 right-2 text-white/50 hover:text-red-400 transition-colors p-1 bg-black/50 rounded-md"
                             >
                               <X className="w-4 h-4" />
@@ -345,7 +460,7 @@ export default function GalleryEventForm({ initialData }: GalleryEventFormProps)
           </DragDropContext>
         ) : (
           <div className="border-2 border-dashed border-white/10 rounded-2xl p-12 text-center text-gray-500">
-            No images uploaded yet.
+            No media added yet.
           </div>
         )}
       </div>

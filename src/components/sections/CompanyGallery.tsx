@@ -1,16 +1,17 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import Link from "next/link";
-import { X, ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, ImageIcon, Video, Calendar, MapPin, AlignLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface GalleryImage {
+interface GalleryMedia {
   id: string;
+  mediaType: "IMAGE" | "VIDEO";
   url: string;
-  publicId: string;
+  publicId?: string;
+  thumbnailUrl?: string;
   isCover: boolean;
   sortOrder: number;
 }
@@ -23,13 +24,13 @@ interface GalleryEvent {
   location: string | null;
   description: string | null;
   isFeatured: boolean;
-  images: GalleryImage[];
+  media: GalleryMedia[];
 }
 
 export default function CompanyGallery({ events }: { events: GalleryEvent[] }) {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [selectedEvent, setSelectedEvent] = useState<GalleryEvent | null>(null);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
 
   // Extract unique categories
   const categories = useMemo(() => {
@@ -44,25 +45,46 @@ export default function CompanyGallery({ events }: { events: GalleryEvent[] }) {
 
   const handleOpenLightbox = (event: GalleryEvent) => {
     setSelectedEvent(event);
-    setCurrentImageIndex(0);
+    setCurrentMediaIndex(0);
   };
 
   const handleCloseLightbox = () => {
     setSelectedEvent(null);
   };
 
-  const handleNextImage = (e: React.MouseEvent) => {
+  const handleNextMedia = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (selectedEvent) {
-      setCurrentImageIndex((prev) => (prev + 1) % selectedEvent.images.length);
+      setCurrentMediaIndex((prev) => (prev + 1) % selectedEvent.media.length);
     }
   };
 
-  const handlePrevImage = (e: React.MouseEvent) => {
+  const handlePrevMedia = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (selectedEvent) {
-      setCurrentImageIndex((prev) => (prev - 1 + selectedEvent.images.length) % selectedEvent.images.length);
+      setCurrentMediaIndex((prev) => (prev - 1 + selectedEvent.media.length) % selectedEvent.media.length);
     }
+  };
+
+  const VideoPreview = ({ src }: { src: string }) => {
+    const videoRef = useRef<HTMLVideoElement>(null);
+    return (
+      <video
+        ref={videoRef}
+        src={src}
+        muted
+        loop
+        playsInline
+        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+        onMouseEnter={() => videoRef.current?.play().catch(() => {})}
+        onMouseLeave={() => {
+          if (videoRef.current) {
+            videoRef.current.pause();
+            videoRef.current.currentTime = 0;
+          }
+        }}
+      />
+    );
   };
 
   return (
@@ -79,7 +101,7 @@ export default function CompanyGallery({ events }: { events: GalleryEvent[] }) {
             viewport={{ once: true }}
             className="text-primary font-heading font-bold uppercase tracking-[0.3em] text-[10px] mb-4 inline-block px-4 py-2 bg-primary/10 border border-primary/20 rounded-full"
           >
-            Showcase
+            Featured Events
           </motion.div>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -105,7 +127,7 @@ export default function CompanyGallery({ events }: { events: GalleryEvent[] }) {
         {categories.length > 1 && (
           <div className="flex flex-wrap justify-center gap-3 mb-12">
             {categories.map(category => (
-              <button
+               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
                 className={cn(
@@ -124,7 +146,7 @@ export default function CompanyGallery({ events }: { events: GalleryEvent[] }) {
         {/* Gallery Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-32 auto-rows-[350px]">
           {filteredEvents.length > 0 ? filteredEvents.map((event, idx) => {
-            const coverImage = event.images.find(img => img.isCover) || event.images[0];
+            const coverMedia = event.media.find(m => m.isCover) || event.media[0];
             
             return (
               <motion.div
@@ -136,19 +158,31 @@ export default function CompanyGallery({ events }: { events: GalleryEvent[] }) {
                 onClick={() => handleOpenLightbox(event)}
                 className={cn(
                   "group relative rounded-[2rem] overflow-hidden bg-white/5 border border-white/10 backdrop-blur-xl transition-all duration-500 hover:border-primary/50 cursor-pointer",
-                  event.isFeatured ? "sm:col-span-2 sm:row-span-2" : "col-span-1 row-span-1"
+                  "sm:col-span-2 sm:row-span-2"
                 )}
               >
-                {/* Image */}
+                {/* Media */}
                 <div className="absolute inset-0 z-0 bg-[#111]">
-                  {coverImage ? (
-                    <Image
-                      src={coverImage.url}
-                      alt={event.name}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
-                      sizes={event.isFeatured ? "(max-width: 640px) 100vw, 50vw" : "(max-width: 640px) 100vw, 25vw"}
-                    />
+                  {coverMedia ? (
+                    coverMedia.mediaType === "VIDEO" ? (
+                      coverMedia.url.includes("youtube.com") || coverMedia.url.includes("youtu.be") ? (
+                        <Image
+                          src={coverMedia.thumbnailUrl || "/"}
+                          alt={event.name}
+                          fill
+                          className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                      ) : (
+                        <VideoPreview src={coverMedia.url} />
+                      )
+                    ) : (
+                      <Image
+                        src={coverMedia.url}
+                        alt={event.name}
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                    )
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-600">
                       <ImageIcon className="w-12 h-12" />
@@ -158,27 +192,21 @@ export default function CompanyGallery({ events }: { events: GalleryEvent[] }) {
                 </div>
 
                 {/* Content Overlay */}
-                <div className="absolute inset-0 z-10 p-6 flex flex-col justify-end">
+                <div className="absolute inset-0 z-10 p-6 flex flex-col justify-end pointer-events-none">
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] text-primary font-bold uppercase tracking-widest px-2 py-1 bg-primary/10 border border-primary/20 rounded-md inline-block">
                         {event.category}
                       </span>
-                      {event.images.length > 1 && (
+                      {event.media.length > 1 && (
                         <span className="text-[10px] text-gray-300 font-bold uppercase tracking-widest px-2 py-1 bg-white/10 rounded-md inline-flex items-center gap-1">
-                          <ImageIcon className="w-3 h-3" /> {event.images.length}
+                          <ImageIcon className="w-3 h-3" /> {event.media.length}
                         </span>
                       )}
                     </div>
-                    <h3 className={cn(
-                      "font-heading font-bold text-white leading-tight",
-                      event.isFeatured ? "text-3xl" : "text-xl"
-                    )}>
+                    <h3 className="font-heading font-bold text-white leading-tight text-3xl">
                       {event.name}
                     </h3>
-                    <p className="text-gray-400 text-xs leading-relaxed opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-500 line-clamp-2">
-                      {event.description || event.location || "View Gallery"}
-                    </p>
                   </div>
                 </div>
 
@@ -189,146 +217,170 @@ export default function CompanyGallery({ events }: { events: GalleryEvent[] }) {
             );
           }) : (
             <div className="col-span-full py-20 text-center text-gray-500">
-              No gallery events found for this category.
+              No gallery events found.
             </div>
           )}
         </div>
-
-        {/* CTA Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="relative rounded-[3rem] p-12 md:p-20 overflow-hidden bg-gradient-to-b from-primary/10 to-transparent border border-primary/20 text-center"
-        >
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/10 blur-[100px] rounded-full -translate-y-1/2 pointer-events-none" />
-          
-          <div className="relative z-10 max-w-4xl mx-auto">
-            <h3 className="text-3xl md:text-5xl font-heading font-bold text-white uppercase tracking-tighter mb-6 leading-tight">
-              Looking for Reliable <br />
-              <span className="text-primary">Lithium Battery Solutions?</span>
-            </h3>
-            <p className="text-gray-400 text-lg mb-12 max-w-2xl mx-auto">
-              Connect with Chinna Mayil Industries for product inquiries, dealer opportunities, and technical support.
-            </p>
-            
-            <div className="flex flex-wrap justify-center gap-4">
-              <Link href="/contact" className="bg-primary text-black font-heading font-bold px-8 py-4 rounded-2xl hover:bg-white transition-all shadow-xl">
-                CONTACT US
-              </Link>
-              <Link href="/auth/dealer-register" className="border border-primary text-primary font-heading font-bold px-8 py-4 rounded-2xl hover:bg-primary hover:text-black transition-all uppercase tracking-widest text-sm">
-                Become a Dealer
-              </Link>
-            </div>
-          </div>
-        </motion.div>
       </div>
 
-      {/* Lightbox Modal */}
+      {/* Detail Modal (65 / 35 Split) */}
       <AnimatePresence>
         {selectedEvent && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-black/95 flex flex-col p-4 md:p-10"
+            className="fixed inset-0 z-[100] bg-black/95 flex p-4 md:p-10 items-center justify-center"
             onClick={handleCloseLightbox}
           >
-            {/* Header */}
-            <div className="flex justify-between items-center mb-6 z-[110]">
-              <div className="text-white">
-                <h3 className="text-2xl font-heading font-bold">{selectedEvent.name}</h3>
-                {selectedEvent.images.length > 1 && (
-                  <p className="text-gray-400 text-sm">
-                    Image {currentImageIndex + 1} of {selectedEvent.images.length}
-                  </p>
+            <motion.button
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-[110]"
+              onClick={handleCloseLightbox}
+            >
+              <X className="w-6 h-6" />
+            </motion.button>
+            
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="w-full max-w-7xl max-h-[90vh] bg-[#0A0A0A] border border-white/10 rounded-3xl overflow-hidden flex flex-col lg:flex-row relative z-[105]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Left 65% (Media Viewer) */}
+              <div className="w-full lg:w-[65%] bg-black relative flex flex-col">
+                <div className="flex-1 relative flex items-center justify-center min-h-[400px]">
+                  {selectedEvent.media.length > 0 ? (
+                    <>
+                      {selectedEvent.media[currentMediaIndex].mediaType === "IMAGE" ? (
+                        <Image
+                          src={selectedEvent.media[currentMediaIndex].url}
+                          alt={selectedEvent.name}
+                          fill
+                          className="object-contain"
+                          priority
+                        />
+                      ) : (
+                        selectedEvent.media[currentMediaIndex].url.includes("youtube.com") || selectedEvent.media[currentMediaIndex].url.includes("youtu.be") ? (
+                           <iframe 
+                            src={`${selectedEvent.media[currentMediaIndex].url}?autoplay=1&mute=1`} 
+                            className="w-full h-full border-none"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          />
+                        ) : (
+                          <video 
+                            src={selectedEvent.media[currentMediaIndex].url} 
+                            controls 
+                            autoPlay 
+                            className="w-full h-full max-h-[70vh] object-contain outline-none" 
+                          />
+                        )
+                      )}
+
+                      {/* Navigation Arrows */}
+                      {selectedEvent.media.length > 1 && (
+                        <>
+                          <button
+                            onClick={handlePrevMedia}
+                            className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/50 border border-white/10 flex items-center justify-center text-white hover:bg-primary hover:text-black hover:border-primary transition-all z-[110]"
+                          >
+                            <ChevronLeft className="w-6 h-6" />
+                          </button>
+                          <button
+                            onClick={handleNextMedia}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/50 border border-white/10 flex items-center justify-center text-white hover:bg-primary hover:text-black hover:border-primary transition-all z-[110]"
+                          >
+                            <ChevronRight className="w-6 h-6" />
+                          </button>
+                        </>
+                      )}
+                    </>
+                  ) : (
+                     <div className="text-gray-500">No media available for this event.</div>
+                  )}
+                </div>
+                
+                {/* Thumbnail Navigation */}
+                {selectedEvent.media.length > 1 && (
+                  <div className="h-24 bg-[#111] border-t border-white/10 flex items-center gap-2 px-4 overflow-x-auto">
+                    {selectedEvent.media.map((m, idx) => (
+                      <button
+                        key={m.id || m.url}
+                        onClick={() => setCurrentMediaIndex(idx)}
+                        className={cn(
+                          "relative w-16 h-16 rounded-lg overflow-hidden border-2 transition-all shrink-0 bg-black",
+                          currentMediaIndex === idx ? "border-primary opacity-100" : "border-transparent opacity-50 hover:opacity-100"
+                        )}
+                      >
+                        {m.mediaType === "IMAGE" || m.thumbnailUrl ? (
+                          <Image src={m.thumbnailUrl || m.url} alt="" fill className="object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Video className="w-6 h-6 text-gray-500" />
+                          </div>
+                        )}
+                        {m.mediaType === "VIDEO" && (
+                           <div className="absolute inset-0 flex items-center justify-center bg-black/30 pointer-events-none">
+                             <Video className="w-4 h-4 text-white" />
+                           </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
                 )}
               </div>
-              <motion.button
-                initial={{ opacity: 0, scale: 0.5 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors"
-                onClick={handleCloseLightbox}
-              >
-                <X className="w-6 h-6" />
-              </motion.button>
-            </div>
 
-            {/* Image Viewer */}
-            <div className="relative flex-1 w-full flex items-center justify-center overflow-hidden">
-              {selectedEvent.images.length > 0 ? (
-                <>
-                  <motion.div
-                    key={`${selectedEvent.id}-${currentImageIndex}`}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.2 }}
-                    className="relative w-full h-full max-w-6xl max-h-[80vh] rounded-2xl overflow-hidden"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Image
-                      src={selectedEvent.images[currentImageIndex].url}
-                      alt={selectedEvent.name}
-                      fill
-                      className="object-contain"
-                      priority
-                    />
-                  </motion.div>
-
-                  {/* Navigation Arrows */}
-                  {selectedEvent.images.length > 1 && (
-                    <>
-                      <button
-                        onClick={handlePrevImage}
-                        className="absolute left-4 md:left-10 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/50 border border-white/10 flex items-center justify-center text-white hover:bg-primary hover:text-black hover:border-primary transition-all z-[110]"
-                      >
-                        <ChevronLeft className="w-6 h-6" />
-                      </button>
-                      <button
-                        onClick={handleNextImage}
-                        className="absolute right-4 md:right-10 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/50 border border-white/10 flex items-center justify-center text-white hover:bg-primary hover:text-black hover:border-primary transition-all z-[110]"
-                      >
-                        <ChevronRight className="w-6 h-6" />
-                      </button>
-                    </>
-                  )}
-                </>
-              ) : (
-                <div className="text-gray-500">No images available for this event.</div>
-              )}
-            </div>
-            
-            {/* Thumbnail Navigation */}
-            {selectedEvent.images.length > 1 && (
-              <div 
-                className="mt-6 flex justify-center gap-2 overflow-x-auto py-2 z-[110]"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {selectedEvent.images.map((img, idx) => (
-                  <button
-                    key={img.id}
-                    onClick={() => setCurrentImageIndex(idx)}
-                    className={cn(
-                      "relative w-16 h-16 rounded-lg overflow-hidden border-2 transition-all shrink-0",
-                      currentImageIndex === idx ? "border-primary opacity-100" : "border-transparent opacity-50 hover:opacity-100"
+              {/* Right 35% (Info Viewer) */}
+              <div className="w-full lg:w-[35%] bg-[#0A0A0A] p-8 lg:p-10 flex flex-col gap-6 overflow-y-auto max-h-[50vh] lg:max-h-none border-l border-white/10">
+                <div>
+                  <div className="text-primary font-bold tracking-widest text-xs uppercase mb-2">
+                    {selectedEvent.category}
+                  </div>
+                  <h2 className="text-3xl font-heading font-bold text-white mb-4">
+                    {selectedEvent.name}
+                  </h2>
+                  <div className="flex flex-col gap-3 text-gray-400 text-sm">
+                    {selectedEvent.eventDate && (
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-primary" />
+                        {new Date(selectedEvent.eventDate).toLocaleDateString(undefined, {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </div>
                     )}
-                  >
-                    <Image src={img.url} alt="" fill className="object-cover" />
-                  </button>
-                ))}
+                    {selectedEvent.location && (
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-primary" />
+                        {selectedEvent.location}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="h-px w-full bg-white/10" />
+                
+                {selectedEvent.description ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-white font-medium">
+                      <AlignLeft className="w-4 h-4 text-primary" />
+                      About this Event
+                    </div>
+                    <p className="text-gray-400 text-sm leading-relaxed whitespace-pre-wrap">
+                      {selectedEvent.description}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="text-gray-600 text-sm italic">
+                    No description provided.
+                  </div>
+                )}
               </div>
-            )}
-            
-            {/* Description if present */}
-            {selectedEvent.description && (
-              <div 
-                className="absolute bottom-10 left-1/2 -translate-x-1/2 max-w-2xl bg-black/80 backdrop-blur-md border border-white/10 p-4 rounded-xl text-center z-[110]"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <p className="text-gray-300 text-sm leading-relaxed">{selectedEvent.description}</p>
-              </div>
-            )}
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

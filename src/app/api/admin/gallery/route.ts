@@ -18,6 +18,9 @@ export async function GET(request: Request) {
         images: {
           orderBy: { sortOrder: "asc" },
         },
+        media: {
+          orderBy: { sortOrder: "asc" },
+        },
       },
       orderBy: { sortOrder: "asc" },
     });
@@ -37,7 +40,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { name, category, eventDate, location, description, isFeatured, isPublished, images } = body;
+    const { name, category, eventDate, location, description, isFeatured, isPublished, images, media } = body;
 
     if (!name || !category || !eventDate) {
       return apiError("Name, category, and event date are required", 400);
@@ -47,6 +50,9 @@ export async function POST(request: Request) {
       _max: { sortOrder: true },
     });
     const nextSortOrder = (maxSortOrder._max.sortOrder ?? -1) + 1;
+
+    // Use media if provided, else fallback to images (for backwards compatibility if any frontend still uses it)
+    const mediaToCreate = media || images || [];
 
     const event = await db.galleryEvent.create({
       data: {
@@ -58,17 +64,20 @@ export async function POST(request: Request) {
         isFeatured: !!isFeatured,
         isPublished: isPublished !== false,
         sortOrder: nextSortOrder,
-        images: {
-          create: images?.map((img: any, i: number) => ({
+        media: {
+          create: mediaToCreate.map((img: any, i: number) => ({
+            mediaType: img.mediaType || "IMAGE",
             url: img.url,
             publicId: img.publicId,
+            thumbnailUrl: img.thumbnailUrl,
             isCover: !!img.isCover,
             sortOrder: i,
-          })) || [],
+          })),
         },
       },
       include: {
-        images: {
+        images: true,
+        media: {
           orderBy: { sortOrder: "asc" },
         },
       },

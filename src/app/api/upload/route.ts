@@ -21,12 +21,14 @@ export async function POST(request: Request) {
 
     if (!file) return apiError("No file provided", 400);
 
-    const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
-    if (file.size > MAX_SIZE) return apiError("File too large (max 5 MB)", 400);
+    const isVideo = file.type.startsWith("video/");
+    const MAX_SIZE = isVideo ? 20 * 1024 * 1024 : 5 * 1024 * 1024; // 20MB video, 5MB image
 
-    const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+    if (file.size > MAX_SIZE) return apiError(`File too large (max ${isVideo ? 20 : 5} MB)`, 400);
+
+    const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "video/mp4", "video/webm"];
     if (!ALLOWED_TYPES.includes(file.type)) {
-      return apiError("Invalid file type. Only JPEG, PNG, WebP, GIF are allowed", 400);
+      return apiError("Invalid file type. Only JPEG, PNG, WebP, GIF, MP4, WebM are allowed", 400);
     }
 
     // Convert file to base64 data URI for Cloudinary
@@ -36,10 +38,11 @@ export async function POST(request: Request) {
 
     const result = await cloudinary.uploader.upload(dataUri, {
       folder,
+      resource_type: "auto",
       use_filename: false,
       unique_filename: true,
       overwrite: false,
-      transformation: [
+      transformation: isVideo ? [] : [
         { quality: "auto:good" },
         { fetch_format: "auto" },
       ],

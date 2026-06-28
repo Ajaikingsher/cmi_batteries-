@@ -21,6 +21,9 @@ export default async function EditGalleryEventPage({ params }: PageProps) {
       images: {
         orderBy: { sortOrder: "asc" },
       },
+      media: {
+        orderBy: { sortOrder: "asc" },
+      },
     },
   });
 

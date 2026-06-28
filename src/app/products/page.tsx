@@ -26,7 +26,7 @@ async function getProducts(searchParams: Awaited<PageProps["searchParams"]>) {
   const limit = 12;
   const search = searchParams.search ?? "";
   const categoryId = searchParams.category ?? undefined;
-  const [sortBy, sortDir] = (searchParams.sort ?? "createdAt:desc").split(":");
+  const [sortBy, sortDir] = (searchParams.sort ?? "sortOrder:asc").split(":");
 
   const where = {
     isActive: true,
@@ -48,7 +48,7 @@ async function getProducts(searchParams: Awaited<PageProps["searchParams"]>) {
         category: { select: { id: true, name: true } },
         inventory: { select: { quantity: true } },
       },
-      orderBy: { [sortBy ?? "createdAt"]: sortDir ?? "desc" },
+      orderBy: { [sortBy ?? "sortOrder"]: sortDir ?? "asc" },
       skip: (page - 1) * limit,
       take: limit,
     }),
@@ -119,9 +119,10 @@ export default async function ProductsPage({ searchParams }: PageProps) {
                 <label className="block text-xs text-gray-400 uppercase tracking-widest mb-2 mt-4">Sort By</label>
                 <select
                   name="sort"
-                  defaultValue={params.sort ?? "createdAt:desc"}
+                  defaultValue={params.sort ?? "sortOrder:asc"}
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-primary transition-colors"
                 >
+                  <option value="sortOrder:asc" className="bg-[#111]">Recommended</option>
                   <option value="createdAt:desc" className="bg-[#111]">Newest First</option>
                   <option value="createdAt:asc" className="bg-[#111]">Oldest First</option>
                   <option value="price:asc" className="bg-[#111]">Price: Low to High</option>
