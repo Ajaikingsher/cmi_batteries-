@@ -5,6 +5,7 @@ import { ShoppingCart, Loader2 } from "lucide-react";
 import { useCart } from "@/store/cart";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 interface AddToCartButtonProps {
   inStock: boolean;
@@ -12,11 +13,18 @@ interface AddToCartButtonProps {
 }
 
 export default function AddToCartButton({ inStock, product }: AddToCartButtonProps) {
+  const { data: session } = useSession();
   const [isAdding, setIsAdding] = useState(false);
   const { addItem, items } = useCart();
   const router = useRouter();
 
   const handleAddToCart = async () => {
+    if (!session?.user) {
+      toast.error("Please sign in to add items to your cart");
+      router.push("/auth/login");
+      return;
+    }
+
     if (!inStock || isAdding) return;
     
     setIsAdding(true);
