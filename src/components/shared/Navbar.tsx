@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -26,6 +26,8 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isSplash, setIsSplash] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const { data: session } = useSession();
   const { totalItems } = useCart();
@@ -48,7 +50,18 @@ export default function Navbar() {
 
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setProfileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   // Close mobile menu on route change
@@ -142,21 +155,60 @@ export default function Navbar() {
             </Link>
 
             {session?.user ? (
-              <div className="flex items-center gap-2">
-                <Link
-                  href={dashboardHref}
-                  className="flex items-center gap-2 bg-white/5 border border-white/10 text-white text-sm font-medium px-3 py-2 rounded-xl hover:bg-white/10 transition-colors"
-                >
-                  <LayoutDashboard className="w-4 h-4" />
-                  Dashboard
-                </Link>
+              <div className="relative" ref={dropdownRef}>
                 <button
-                  onClick={() => signOut({ callbackUrl: "/" })}
-                  className="text-gray-400 hover:text-red-400 transition-colors p-2 rounded-xl hover:bg-red-400/10"
-                  aria-label="Sign Out"
+                  onClick={() => setProfileOpen(!profileOpen)}
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors border border-white/20 overflow-hidden"
                 >
-                  <LogOut className="w-4 h-4" />
+                  {session.user.image ? (
+                    <img src={session.user.image} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    <User className="w-5 h-5 text-gray-300" />
+                  )}
                 </button>
+
+                <AnimatePresence>
+                  {profileOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 mt-3 w-56 bg-[#111] border border-white/10 rounded-2xl shadow-2xl py-2 z-50 overflow-hidden"
+                    >
+                      <div className="px-4 py-3 border-b border-white/10 mb-2">
+                        <p className="text-white text-sm font-bold truncate">
+                          {session.user.name || "User"}
+                        </p>
+                        <p className="text-gray-400 text-xs truncate mt-0.5">
+                          {session.user.email}
+                        </p>
+                      </div>
+
+                      <Link
+                        href={dashboardHref}
+                        onClick={() => setProfileOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
+                      >
+                        <LayoutDashboard className="w-4 h-4 text-primary" />
+                        Dashboard
+                      </Link>
+
+                      <div className="h-px bg-white/10 my-2" />
+
+                      <button
+                        onClick={() => {
+                          setProfileOpen(false);
+                          signOut({ callbackUrl: "/" });
+                        }}
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-400/10 transition-colors w-full text-left"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Sign out
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             ) : (
               <>
