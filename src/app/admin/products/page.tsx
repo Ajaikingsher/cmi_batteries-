@@ -71,7 +71,15 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
 
       {/* Table */}
       {/* Table Client Component */}
-      <ProductListClient initialProducts={products} search={search} />
+      <ProductListClient 
+        initialProducts={products.map(p => ({
+          ...p,
+          price: Number(p.price),
+          dealerPrice: p.dealerPrice ? Number(p.dealerPrice) : null,
+          taxRate: Number(p.taxRate),
+        }))} 
+        search={search} 
+      />
 
       {/* Pagination */}
       {totalPages > 1 && (
